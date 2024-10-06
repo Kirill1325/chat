@@ -8,8 +8,6 @@ interface TokenData {
     isActivated: boolean
 }
 
-// TODO: add injection defence
-
 class TokenService {
     async generateTokens(payload: TokenData) {
         const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' })

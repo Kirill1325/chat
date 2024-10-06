@@ -1,0 +1,36 @@
+@import "../../vars.scss";
+
+.button {
+    padding: .2em;
+    border-radius: 5px;
+    border: 1px solid #000;
+    height: 3em;
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    cursor: pointer;
+
+}
+
+.outlined {
+    background: transparent;
+    border-color: $primary;
+    color: $primary;
+
+    &:hover {
+        border-color: $secondary;
+        color: $secondary;
+    }
+
+}
+
+.contained {
+    background: $primary;
+    color: white;
+
+    &:hover {
+        background: $secondary;
+    }
+}

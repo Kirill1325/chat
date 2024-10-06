@@ -1,0 +1,74 @@
+@import "../../../shared/vars.scss";
+
+.container {
+    background: $primary;
+    background: linear-gradient(90deg, $primary 16%, $secondary 65%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 2em;
+
+    >.content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1em;
+        border-radius: 2vmax;
+        width: 100%;
+        height: 100%;
+        padding: 2.5em;
+        background-color: white;
+
+        >form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+
+            >input {
+                width: 100%;
+                margin-top: .5em;
+                margin-bottom: 2.2em;
+            }
+
+            >button {
+                width: 100%;
+            }
+        }
+
+        >button {
+            width: 100%;
+        }
+
+        >.headingContainer {
+            position: relative;
+            width: 100%;
+            text-align: center;
+
+            &::after {
+                content: '';
+                width: 100%;
+                border-bottom: solid 1px black;
+                position: absolute;
+                left: 0;
+                top: 50%;
+                z-index: 1;
+            }
+
+            >h4 {
+                background-color: white;
+                display: inline-block;
+                z-index: 3;
+                padding: 0 20px 0 20px;
+                position: relative;
+                margin: 0;
+            }
+        }
+
+        >a {
+            text-decoration: none;
+            color: black;
+
+        }
+    }
+}

@@ -10,7 +10,7 @@ export class AuthController {
             const userData = await authService.registration(username, email, password)
 
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'none' })
-            
+
             res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_URL);
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
             res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
@@ -81,6 +81,22 @@ export class AuthController {
             return res.json(users)
         } catch (e) {
             res.json(e)
+        }
+    }
+
+    async changePassword(req: Request, res: Response, next: NextFunction) {
+
+        // TODO: add mail letter that updates password
+        try {
+
+            const {oldPassword, newPassword } = req.body
+            const { refreshToken } = req.cookies
+
+            const user = await authService.changePassword(oldPassword,newPassword, refreshToken)
+
+            return res.json(user)
+        } catch (e) {
+            next(e)
         }
     }
 

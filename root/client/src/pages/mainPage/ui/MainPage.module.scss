@@ -1,0 +1,15 @@
+.mainPage {
+    display: flex;
+    flex-direction: column;
+
+    @media screen and (min-width: 768px) {
+        max-height: 100vh;
+        display: grid;
+        grid-template-areas:
+            "chatsListHeader chatWindowHeader"
+            "chatsList chatWindow";
+
+        grid-template-rows: 7vh 1fr;
+        grid-template-columns: 35vw 65vw;
+    }
+}
