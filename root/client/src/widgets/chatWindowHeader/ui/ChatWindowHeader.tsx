@@ -1,4 +1,3 @@
-import React from 'react'
 import cl from './ChatWindowHeader.module.scss'
 
 export const ChatWindowHeader = () => {
