@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { User, Response } from '..'
-import { UpdatePasswordRequest } from '../model/types'
+import { UpdatePasswordRequest, UserDto } from '../model/types'
 import { ChatType } from '../../chatCard'
 import { Message } from '../../message'
 
@@ -14,6 +14,17 @@ export const userApi = createApi({
     baseQuery,
 
     endpoints: (builder) => ({
+
+        getUsers: builder.query<Omit<UserDto, 'email'>[], void>({
+            query: () => ({
+                url: 'auth/users',
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                },
+            }),
+        }),
 
         registration: builder.mutation<Response, Partial<User>>({
             query: (user) => ({

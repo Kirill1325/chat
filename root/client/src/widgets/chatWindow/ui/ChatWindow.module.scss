@@ -8,5 +8,20 @@
 
     }
 
+    >.chatWindowContent {
+        display: flex;
+        flex-direction: column;
+        height: 93vh;
+        overflow-y: scroll;
+
+        >.dropdown{
+            display: none;
+        }
+
+        >.open{
+            display: flex;
+        }
+    }
+
 
 }

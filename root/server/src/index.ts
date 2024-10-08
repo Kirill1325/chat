@@ -25,6 +25,7 @@ server.listen(PORT, () => console.log(`App listening on port ${PORT}`))
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,
+    credentials: true
   }
 });
 

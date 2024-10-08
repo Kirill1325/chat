@@ -18,7 +18,8 @@ class chatsService {
         return {chat_id: chatId["MAX(chat_id)"]}
     }
 
-    async connectToChat() {
+    async connectToChat(chatId: number, userId: number) {
+        await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES (?, ?);', [chatId, userId])
 
     }
 
@@ -27,7 +28,6 @@ class chatsService {
         const chat_members = await pool.query('SELECT * FROM chat_members WHERE user_id = ?;', [userId])
 
         const chats_ids = chat_members[0].constructor === Array && chat_members[0].map((chat: any) => chat.chat_id)
-        // console.log('chats_ids ', chats_ids)
 
         if (chats_ids.length === 0) {
             return []

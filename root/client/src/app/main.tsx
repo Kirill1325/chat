@@ -10,8 +10,7 @@ import { MainPage } from '../pages/mainPage';
 import { io } from 'socket.io-client';
 
 export const socket = io(import.meta.env.VITE_SERVER_URL, {
-  // ackTimeout: 10000,
-  // retries: 3,
+  withCredentials: true,
 });
 
 socket.on('connect', () => {
@@ -32,7 +31,6 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
 ]);
-// fix
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

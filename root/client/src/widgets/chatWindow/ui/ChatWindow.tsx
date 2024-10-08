@@ -5,15 +5,19 @@ import { Input } from '../../../shared/input'
 import { socket } from '../../../app/main'
 import { Message } from '../../../entities/message'
 import { Button, ButtonVariants } from '../../../shared/button'
+import { userApi } from '../../../entities/user'
 
 export const ChatWindow = () => {
 
   const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
 
   const { user } = useAppSelector(state => state.userSlice)
+  const { data: users } = userApi.useGetUsersQuery()
 
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
+
+  const [isDropdpwnOpen, setIsDropdownOpen] = useState(false)
 
   useEffect(() => {
 
@@ -45,28 +49,43 @@ export const ChatWindow = () => {
   return (
     <div className={cl.chatWindow}>
 
-      <div className={cl.chatWindowContent}>
-        {currentChatId === null
-          ? <div>Select a chat</div>
-          : <div>
-            {currentChatId}
-            {messages && messages.map(message =>
-              <div
-                style={{ textAlign: message.sender_id === user.id ? 'right' : 'left' }}
-                key={message.message_id}
-              >
-                {message.payload}
-              </div>)}
-            <Input
-              type='text'
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            />
-            <Button variant={ButtonVariants.contained} onClick={handleSendMessage}>send</Button>
+      {currentChatId === null
+        ? <div>Select a chat</div>
+        : <div className={cl.chatWindowContent}>
+          <p>{currentChatId}</p>
+          <Button
+            variant={ButtonVariants.outlined}
+            onClick={() => setIsDropdownOpen(!isDropdpwnOpen)}
+          >
+            Add user
+          </Button>
+          <div className={`${cl.dropdown} ${isDropdpwnOpen ? cl.open : ''}`}>
+            {users &&
+              users.map(user =>
+                <Button
+                  variant={ButtonVariants.contained}
+                  key={user.id}
+                >
+                  {user.username}
+                </Button>
+              )}
           </div>
-        }
-      </div>
+          {messages && messages.map(message =>
+            <div
+              style={{ textAlign: message.sender_id === user.id ? 'right' : 'left' }}
+              key={message.message_id}
+            >
+              {message.payload}
+            </div>)}
+          <Input
+            type='text'
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+          />
+          <Button variant={ButtonVariants.contained} onClick={handleSendMessage}>send</Button>
+        </div>
+      }
     </div>
   )
 }

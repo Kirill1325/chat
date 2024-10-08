@@ -15,7 +15,9 @@ export class ChatsController {
 
     async connectToChat(req: Request, res: Response, next: NextFunction) {
         try {
-
+            const { chatId, userId } = req.body
+            await chatsService.connectToChat(parseInt(chatId), parseInt(userId))
+            return res.sendStatus(200)
         } catch (e) {
             next(e)
         }

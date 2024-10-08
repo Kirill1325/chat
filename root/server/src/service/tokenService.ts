@@ -5,7 +5,6 @@ import { FieldPacket, QueryResult } from 'mysql2'
 interface TokenData {
     email: string
     id: string
-    isActivated: boolean
 }
 
 class TokenService {

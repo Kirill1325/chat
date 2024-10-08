@@ -2,7 +2,12 @@ import { pool } from "../config/dbConfig";
 import bcrypt from 'bcrypt'
 import { tokenService } from "./tokenService";
 import { ApiError } from "../exceptions/apiError";
-import { UserDto } from "../dtos/userDto";
+import { IUserDto, UserDto } from "../dtos/userDto";
+
+interface User {
+    id: number
+    username: string
+}
 
 class AuthService {
 
@@ -96,11 +101,20 @@ class AuthService {
         }
     }
 
-    async getUsers() {
+    async getUsers(): Promise<User[]> {
 
         const users = await pool.query('SELECT * FROM users')
 
-        return users[0][0]
+        console.log('users ', users[0])
+
+        users[0].constructor === Array && users[0].forEach((user) => {
+            delete user.password
+            delete user.email
+            delete user.status
+            delete user.role
+        })
+
+        return users[0] as User[]
     }
 
     async changePassword(oldPassword: string, newPassword: string, refreshToken: string) {
