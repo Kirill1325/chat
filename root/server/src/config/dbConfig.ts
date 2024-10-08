@@ -52,10 +52,11 @@ export const createTables = () => {
   const messagesTable = `CREATE TABLE IF NOT EXISTS messages (
     message_id INTEGER PRIMARY KEY AUTO_INCREMENT,
     sender_id INTEGER,
-    group_id INTEGER,
+    chat_id INTEGER,
     payload VARCHAR(255),
-    created_at TIMESTAMP,
-    FOREIGN KEY (message_id) REFERENCES users(id)
+    created_at INTEGER,
+    status ENUM('sending','sent','read'),
+    FOREIGN KEY (sender_id) REFERENCES users(id)
   );`
 
   pool
@@ -68,8 +69,8 @@ export const createTables = () => {
 
     });
 
-  const conversationsTable = `CREATE TABLE IF NOT EXISTS conversations (
-    conversation_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  const chatsTable = `CREATE TABLE IF NOT EXISTS chats (
+    chat_id INTEGER PRIMARY KEY AUTO_INCREMENT,
     last_sent_message_id INTEGER,
     last_sent_user_id INTEGER,
     FOREIGN KEY (last_sent_message_id) REFERENCES messages(message_id),
@@ -77,7 +78,7 @@ export const createTables = () => {
   );`
 
   pool
-    .query(conversationsTable)
+    .query(chatsTable)
     .then((res: any) => {
       console.log(res);
     })
@@ -86,15 +87,15 @@ export const createTables = () => {
 
     });
 
-  const conversationMembersTable = `CREATE TABLE IF NOT EXISTS conversation_members (
+  const chatMembersTable = `CREATE TABLE IF NOT EXISTS chat_members (
     user_id INTEGER,
-    conversation_id INTEGER,
+    chat_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id)
+    FOREIGN KEY (chat_id) REFERENCES chats(chat_id)
   );`
 
   pool
-    .query(conversationMembersTable)
+    .query(chatMembersTable)
     .then((res: any) => {
       console.log(res);
     })

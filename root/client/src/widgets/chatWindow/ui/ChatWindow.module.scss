@@ -2,7 +2,7 @@
     display: none;
     grid-area: chatWindow;
 
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 640px) {
         display: flex;
         flex-direction: column;
 

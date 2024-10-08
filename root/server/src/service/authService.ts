@@ -105,9 +105,9 @@ class AuthService {
 
     async changePassword(oldPassword: string, newPassword: string, refreshToken: string) {
 
-        console.log('refreshToken ', refreshToken)
-        console.log('newPassword ', newPassword)
-        console.log('oldPassword ', oldPassword)
+        // console.log('refreshToken ', refreshToken)
+        // console.log('newPassword ', newPassword)
+        // console.log('oldPassword ', oldPassword)
 
         const userData = tokenService.validateRefreshToken(refreshToken)
         console.log('userData ', userData)

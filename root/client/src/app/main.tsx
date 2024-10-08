@@ -7,6 +7,16 @@ import { RegisterPage } from '../pages/register';
 import store from './store';
 import './App.scss'
 import { MainPage } from '../pages/mainPage';
+import { io } from 'socket.io-client';
+
+export const socket = io(import.meta.env.VITE_SERVER_URL, {
+  // ackTimeout: 10000,
+  // retries: 3,
+});
+
+socket.on('connect', () => {
+  console.log('WebSocket connected');
+});
 
 const router = createBrowserRouter([
   {

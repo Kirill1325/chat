@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { User, Response } from '..'
 import { UpdatePasswordRequest } from '../model/types'
+import { ChatType } from '../../chatCard'
+import { Message } from '../../message'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
@@ -71,5 +73,52 @@ export const userApi = createApi({
             })
         }),
 
+        createChat: builder.mutation<{ chat_id: number }, number>({
+            query: (creatorId) => ({
+                url: 'chats/create',
+                method: 'POST',
+                body: { creatorId },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                },
+            })
+
+        }),
+
+        getChats: builder.query<ChatType[], number>({
+            query: (userId) => ({
+                url: `chats/get-chats/${userId}`,
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                },
+            })
+        }),
+
+        // getMessagesFromChat: builder.query<Message[], number>({
+        //     query: (chatId) => ({
+        //         url: `messages/get-messages/${chatId}`,
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+        //         },
+        //     })
+        // }),
+
+        getMessageById: builder.query<Message, number>({
+            query: (messageId) => ({
+                url: `messages/get-message-by-id/${messageId}`,
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                },
+            })
+        }),
+
+        
     }),
 })

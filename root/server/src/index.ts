@@ -3,8 +3,10 @@ import express from 'express';
 import http from 'http';
 import { configure } from './config/appConfig';
 import { createTables } from './config/dbConfig';
-import WebSocket, { WebSocketServer } from 'ws';
+// import WebSocket, { WebSocketServer } from 'ws';
+import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from 'uuid';
+import { messageService } from './service/messageService';
 
 const PORT = process.env.PORT || 3000
 
@@ -20,31 +22,42 @@ console.log(`Attempting to run server on port ${PORT}`)
 
 server.listen(PORT, () => console.log(`App listening on port ${PORT}`))
 
-const webSocketServer = new WebSocketServer({ server });
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+  }
+});
 
-const rooms = {}
 
-webSocketServer.on('connection', function connection(ws) {
+io.on('connection', (socket: Socket) => {
 
-    const uuid = uuidv4(); // create here a uuid for this connection
+  console.log('a user connected');
 
-    const leave = room => {
-        // not present: do nothing
-        if (!rooms[room][uuid]) return;
+  socket.on('join room', async (chatId: string, userId: number) => {
+    await socket.join(chatId);
+    console.log(`user ${userId} joined room ${chatId}`)
+  });
+  socket.on('leave room', async (chatId: string, userId: number) => {
+    await socket.leave(chatId);
+    console.log(`user ${userId} left room ${chatId}`)
+  });
 
-        // if the one exiting is the last one, destroy the room
-        if (Object.keys(rooms[room]).length === 1) delete rooms[room];
-        // otherwise simply leave the room
-        else delete rooms[room][uuid];
-    };
+  socket.on('send message', async (userId: number, chatId: number, payload: string, createdAt: number) => {
+    console.log(userId, chatId, payload, createdAt)
+    const sentMessage = await messageService.sendMessage(userId, chatId, payload, createdAt)
 
-    ws.on('error', console.error)
+    const recievedMessage = await messageService.getMessageById(sentMessage.message_id)
 
-    ws.on('message', function message(data, isBinary) {
-        webSocketServer.clients.forEach(function each(client) {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(data, { binary: isBinary });
-            }
-        });
-    });
+    socket.emit('receive message', recievedMessage)
+  })
+
+  socket.on('get messages', async (chatId: number) => {
+
+    const messages = await messageService.getMessages(chatId)
+
+    socket.emit('receive messages', messages)
+  })
+
+  socket.on('disconnect', () => console.log('user disconnected'));
+
 })
