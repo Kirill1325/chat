@@ -1,27 +1,96 @@
+@import '../../../shared/vars.scss';
+
 .chatWindow {
     display: none;
-    grid-area: chatWindow;
 
     @media screen and (min-width: 640px) {
+        width: 70vw;
+        max-height: 100vh;
         display: flex;
         flex-direction: column;
-
+        overflow: hidden;
     }
 
-    >.chatWindowContent {
+    >.messages {
         display: flex;
+        height: 100%;
         flex-direction: column;
-        height: 93vh;
         overflow-y: scroll;
+        padding: .5em .5em 0 .5em;
+    }
 
-        >.dropdown{
-            display: none;
+    >.inputContainer {
+        position: relative;
+        height: 3em;
+
+        >textarea {
+            resize: none;
+            overflow: auto;
+            color: black;
+            background: $secondary;
+            border: none;
+            outline: none;
+            width: 100%;
+            height: 100%;
+            font-size: 1.3em;
+            padding: .5em 1.5em .5em 1em;
         }
 
-        >.open{
+        >button {
+            position: absolute;
             display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            height: 2em;
+            width: 2em;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: black;
+
+            background: transparent;
+            outline: none;
+            border: none;
         }
     }
 
+    >.dropdown {
+        display: none;
 
+        >p{
+            cursor: pointer;
+
+            &:hover {
+                border: 1px solid white;
+            }
+        }
+    }
+
+    >.open {
+        display: flex;
+        position: absolute;
+        background-color: black;
+        width: 5em;
+        top: 10%;
+        right: 10px;
+        padding: .5em;
+    }
+
+}
+
+.open {
+    display: flex;
+    width: 100vw;
+    max-height: 100vh;
+    flex-direction: column;
+    overflow: hidden;
+
+    @media screen and (min-width: 640px) {
+        width: 70vw;
+        // max-height: 100vh;
+        // display: flex;
+        // flex-direction: column;
+        // overflow: hidden;
+    }
 }

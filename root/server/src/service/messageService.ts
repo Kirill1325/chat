@@ -18,7 +18,7 @@ export interface Message {
 
 class MessageService {
 
-    async sendMessage(senderId: number, chatId: number, payload: string, createdAt: number): Promise<{ message_id: number; }> {
+    async sendMessage(senderId: number, chatId: number, payload: string, createdAt: string): Promise<{ message_id: number; }> {
         // TODO: add status
         
         await pool.query(
@@ -29,7 +29,7 @@ class MessageService {
         await pool.query('UPDATE chats SET last_sent_message_id=LAST_INSERT_ID(), last_sent_user_id = ? WHERE chat_id = ?', [senderId, chatId ])
 
         const lastSentMessageId = await pool.query('SELECT LAST_INSERT_ID() as message_id')
-        console.log('lastSentMessageId ', lastSentMessageId[0][0])
+        // console.log('lastSentMessageId ', lastSentMessageId[0][0])
         return lastSentMessageId[0][0]
     }
 

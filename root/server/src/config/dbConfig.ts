@@ -54,7 +54,7 @@ export const createTables = () => {
     sender_id INTEGER,
     chat_id INTEGER,
     payload VARCHAR(255),
-    created_at INTEGER,
+    created_at VARCHAR(255),
     status ENUM('sending','sent','read'),
     FOREIGN KEY (sender_id) REFERENCES users(id)
   );`

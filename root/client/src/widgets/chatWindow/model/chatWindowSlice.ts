@@ -1,11 +1,13 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface chatWindowState {
-    currentChatId: number | null
+    currentChatId: number | null,
+    isOpen: boolean
 }
 
 const initialState: chatWindowState = {
-    currentChatId: null
+    currentChatId: null,
+    isOpen: false
 }
 
 export const chatWindowSlice = createSlice({
@@ -14,12 +16,15 @@ export const chatWindowSlice = createSlice({
     reducers: {
         changeChatId: (state, action) => {
             state.currentChatId = action.payload
-        }
+        },
+        setIsOpen: (state, action: PayloadAction<boolean>) => {
+            state.isOpen = action.payload
+        },
     },
 })
 
 const { actions, reducer } = chatWindowSlice
 
-export const { changeChatId } = actions
+export const { changeChatId, setIsOpen } = actions
 
 export default reducer

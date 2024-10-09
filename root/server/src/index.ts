@@ -42,7 +42,7 @@ io.on('connection', (socket: Socket) => {
     console.log(`user ${userId} left room ${chatId}`)
   });
 
-  socket.on('send message', async (userId: number, chatId: number, payload: string, createdAt: number) => {
+  socket.on('send message', async (userId: number, chatId: number, payload: string, createdAt: string) => {
     console.log(userId, chatId, payload, createdAt)
     const sentMessage = await messageService.sendMessage(userId, chatId, payload, createdAt)
 

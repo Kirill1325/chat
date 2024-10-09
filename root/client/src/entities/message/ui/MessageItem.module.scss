@@ -1,0 +1,47 @@
+@import '../../../shared/vars.scss';
+
+.message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // justify-content: flex-end;
+    // gap: .3em;
+    width: fit-content;
+    height: 4em;
+    padding: .4em .5em;
+    background-color: $secondary;
+    border-radius: 1vmax;
+    margin-bottom: .6em;
+
+    >* {
+        font-size: .9em;
+    }
+
+    >p {
+        width: 100%;
+        text-align: start;
+        color: rgb(191, 81, 255);
+    }
+
+    >.messageContent {
+        display: flex;
+        gap: .4em;
+
+        >b {
+            align-self: flex-end;
+            font-size: .7em;
+        }
+    }
+
+}
+
+.myMessage {
+    align-self: flex-end;
+
+    background-color: rgb(0, 88, 176);
+
+    >p {
+        width: 100%;
+        text-align: end;
+    }
+}

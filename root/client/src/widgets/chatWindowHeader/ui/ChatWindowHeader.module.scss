@@ -1,19 +1,40 @@
-.chatWindowHeader {
-    grid-area: chatWindowHeader;
-    display: none;
+@import '../../../shared/vars.scss';
 
-    @media screen and (min-width: 640px) {
+.chatWindowHeader {
+    height: 5rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    padding: 0 1em;
+    border-bottom: 1px solid #464646;
+    background-color: $secondary;
+
+    >div {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 1em;
-        height: auto;
-        border-bottom: 1px solid #464646;
+        gap: 1em;
+
+        >button {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 2em;
+            height: 2em;
+            cursor: pointer;
+        }
     }
 
     >button {
         border: none;
         outline: none;
         background: transparent;
+        width: 2em;
+        height: 2em;
+        cursor: pointer;
+
+        @media screen and (min-width: 640px) {
+            display: none;
+        }
     }
 }

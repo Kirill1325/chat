@@ -1,10 +1,22 @@
+@import '../../../shared/vars.scss';
+
 .chatsList {
-    grid-area: chatsList;
-    height: 93vh;
+    background-color: $secondary;
+    max-height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
     @media screen and (min-width: 640px) {
         border-right: 1px solid #464646;
-        overflow-y: scroll;
+        width: 30vw;
+    }
+
+    >.chats {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
     }
 }
 
@@ -12,18 +24,27 @@
     width: .2em;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
     background: #464646;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+.close {
+    display: none;
+
+    @media screen and (min-width: 640px) {
+        display: flex;
+        // max-height: 100vh;
+        // display: flex;
+        // flex-direction: column;
+        // overflow: hidden;
+    }
 }
