@@ -17,8 +17,14 @@
         flex-direction: column;
         overflow-y: scroll;
         padding: .5em .5em 0 .5em;
-    }
 
+        >.dummyDiv{
+            width: 100%;
+            height: 1em;
+        }
+    
+    }
+    
     >.inputContainer {
         position: relative;
         height: 3em;

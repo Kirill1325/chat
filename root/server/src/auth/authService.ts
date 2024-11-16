@@ -1,8 +1,8 @@
 import { pool } from "../config/dbConfig";
 import bcrypt from 'bcrypt'
-import { tokenService } from "./tokenService";
 import { ApiError } from "../exceptions/apiError";
-import { IUserDto, UserDto } from "../dtos/userDto";
+import { UserDto } from "./userDto";
+import { tokenService } from "../token/tokenService";
 
 interface User {
     id: number
@@ -13,28 +13,30 @@ class AuthService {
 
     async registration(username: string, email: string, password: string) {
 
+        // console.log(username, email, password)
+
         if (!username || !email || !password) {
             throw ApiError.BadRequest('Username, email and password are required')
         }
 
-        const mailCandidate = await pool.query('SELECT * FROM users WHERE email = ?', [email])
-        const usernameCandidate = await pool.query('SELECT * FROM users WHERE username = ?', [username])
+        const mailCandidate = await pool.query('SELECT * FROM users WHERE email = $1', [email])
+        const usernameCandidate = await pool.query('SELECT * FROM users WHERE username = $1', [username])
 
-        if (mailCandidate[0].constructor === Array && mailCandidate[0].length > 0) {
+        if (mailCandidate.rows.length > 0) {
             throw ApiError.BadRequest('User with this email already exists')
         }
-        if (usernameCandidate[0].constructor === Array && usernameCandidate[0].length > 0) {
+        if (usernameCandidate.rows.length > 0) {
             throw ApiError.BadRequest('This username already exists')
         }
 
         const hashPassword = await bcrypt.hash(password, 12)
+        // TODO: add mail activation link
 
-        await pool.query('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hashPassword])
+        const user = await pool.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *', [username, email, hashPassword])
 
-        const user = await pool.query('SELECT * FROM users WHERE email = ?', [email])
-        const userDto = new UserDto(user[0][0])
+        const userDto = new UserDto(user.rows[0])
         const tokens = await tokenService.generateTokens({ ...userDto })
-        await tokenService.saveToken(user[0][0].id, tokens.refreshToken)
+        await tokenService.saveToken(user.rows[0].id, tokens.refreshToken)
 
         return {
             ...tokens,
@@ -48,15 +50,15 @@ class AuthService {
             throw ApiError.BadRequest('Email and password are required')
         }
 
-        const user = await pool.query('SELECT * FROM users WHERE email = ?', [email])
+        const user = await pool.query('SELECT * FROM users WHERE email = $1', [email])
 
-        if (user[0].constructor === Array && user[0].length === 0) {
+        if (user.rows.length === 0) {
             throw ApiError.BadRequest('User not found')
         }
 
-        const userDto = new UserDto(user[0][0])
+        const userDto = new UserDto(user.rows[0])
 
-        const isPasswordEquals = await bcrypt.compare(password, user[0][0].password)
+        const isPasswordEquals = await bcrypt.compare(password, user.rows[0].password)
 
         if (!isPasswordEquals) {
             throw ApiError.BadRequest('Password is wrong')
@@ -64,7 +66,7 @@ class AuthService {
 
         const tokens = await tokenService.generateTokens({ ...userDto })
 
-        await tokenService.saveToken(user[0][0].id, tokens.refreshToken)
+        await tokenService.saveToken(user.rows[0].id, tokens.refreshToken)
 
         return {
             ...tokens,
@@ -83,6 +85,7 @@ class AuthService {
         }
 
         const userData = tokenService.validateRefreshToken(refreshToken)
+        // console.log(userData)
 
         const tokenFromDb = await tokenService.findToken(refreshToken)
 
@@ -90,10 +93,10 @@ class AuthService {
             throw ApiError.BadRequest('Invalid token')
         }
 
-        const user = await pool.query('SELECT * FROM users WHERE id = ?', [userData.id])
-        const userDto = new UserDto(user[0][0])
+        const user = await pool.query('SELECT * FROM users WHERE id = $1', [userData.id])
+        const userDto = new UserDto(user.rows[0])
         const tokens = await tokenService.generateTokens({ ...userDto })
-        await tokenService.saveToken(user[0][0].id, tokens.refreshToken)
+        await tokenService.saveToken(user.rows[0].id, tokens.refreshToken)
 
         return {
             ...tokens,
@@ -103,20 +106,21 @@ class AuthService {
 
     async getUsers(): Promise<User[]> {
 
-        const users = await pool.query('SELECT * FROM users')
+        const users = (await pool.query('SELECT * FROM users')).rows
 
-        console.log('users ', users[0])
+        // console.log('users ', users)
 
-        users[0].constructor === Array && users[0].forEach((user) => {
+        users.forEach((user) => {
             delete user.password
             delete user.email
             delete user.status
             delete user.role
         })
 
-        return users[0] as User[]
+        return users as User[]
     }
 
+    // TODO: update for postgres
     async changePassword(oldPassword: string, newPassword: string, refreshToken: string) {
 
         // console.log('refreshToken ', refreshToken)
@@ -124,10 +128,10 @@ class AuthService {
         // console.log('oldPassword ', oldPassword)
 
         const userData = tokenService.validateRefreshToken(refreshToken)
-        console.log('userData ', userData)
+        // console.log('userData ', userData)
 
-        const user = await pool.query('SELECT * FROM users WHERE email = ?', [userData.email])
-        console.log('user ', user[0][0])
+        const user = await pool.query('SELECT * FROM users WHERE email = $1', [userData.email])
+        // console.log('user ', user[0][0])
 
         const isPasswordEquals = await bcrypt.compare(oldPassword, user[0][0].password)
 
@@ -144,7 +148,7 @@ class AuthService {
             throw ApiError.BadRequest("Something went wrong... Maybe you're not authorized")
         }
 
-        await pool.query('UPDATE users SET password = ? WHERE email = ?', [hashPassword, userData.email])
+        await pool.query('UPDATE users SET password = $1 WHERE email = $2', [hashPassword, userData.email])
 
         const userDto = new UserDto(user[0][0])
 

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { User, Response } from '..'
 import { UpdatePasswordRequest, UserDto } from '../model/types'
-import { ChatType } from '../../chatCard'
+import { ChatType, ChatTypes } from '../../chatCard'
 import { Message } from '../../message'
 
 const baseQuery = fetchBaseQuery({
@@ -84,11 +84,11 @@ export const userApi = createApi({
             })
         }),
 
-        createChat: builder.mutation<{ chat_id: number }, number>({
-            query: (creatorId) => ({
+        createChat: builder.mutation<{ chat_id: number }, { creatorId: number , type: ChatTypes}>({
+            query: ({creatorId, type}) => ({
                 url: 'chats/create',
                 method: 'POST',
-                body: { creatorId },
+                body: { creatorId, type },
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
@@ -99,7 +99,7 @@ export const userApi = createApi({
 
         getChats: builder.query<ChatType[], number>({
             query: (userId) => ({
-                url: `chats/get-chats/${userId}`,
+                url: `chats/${userId}`,
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -119,9 +119,20 @@ export const userApi = createApi({
         //     })
         // }),
 
-        getMessageById: builder.query<Message, number>({
-            query: (messageId) => ({
-                url: `messages/get-message-by-id/${messageId}`,
+        // getMessageById: builder.query<Message, number>({
+        //     query: (messageId) => ({
+        //         url: `messages/get-message-by-id/${messageId}`,
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+        //         },
+        //     })
+        // }),
+
+        getLastMessage: builder.query<string, number>({
+            query: (chatId) => ({
+                url: `chats/last-message/${chatId}`,
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -130,6 +141,15 @@ export const userApi = createApi({
             })
         }),
 
-        
+        getLastUser: builder.query<string, number>({
+            query: (chatId) => ({
+                url: `chats/last-user/${chatId}`,
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                },
+            })
+        }),
     }),
 })

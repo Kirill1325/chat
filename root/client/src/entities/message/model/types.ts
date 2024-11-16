@@ -1,9 +1,9 @@
 export type Message = {
-    message_id: number,
-    sender_id: number,
-    chat_id: number,
+    messageId: number,
+    senderId: number,
+    chatId: number,
     payload: string,
-    created_at: string,
+    createdAt: string,
     status: Status
 }
 

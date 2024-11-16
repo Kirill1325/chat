@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { messageService } from '../service/messageService';
+import { messageService } from '../messages/messageService';
+
+// TODO: delte this
 
 export class MessageController {
 
@@ -28,7 +30,7 @@ export class MessageController {
     async getMessages(req: Request, res: Response, next: NextFunction) {
         try {
             const chatId  = req.params['chat_id']
-            console.log('chatId ', chatId)
+            // console.log('chatId ', chatId)
             const messages = await messageService.getMessages(parseInt(chatId))
             return res.json(messages)
         } catch (e) {

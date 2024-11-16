@@ -1,13 +1,14 @@
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import cl from './Sidebar.module.scss'
 import { closeSidebar } from '../model/sidebarSlice'
-import { Button, ButtonVariants } from '../../../shared/button'
 import { userApi } from '../../../entities/user'
 import { useNavigate } from 'react-router-dom'
 import { openSettingsModal } from '../../ssettingsModal/model/settingsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
 import { socket } from '../../../app/main'
 import { skipToken } from '@reduxjs/toolkit/query/react'
+import { ChatTypes } from '../../../entities/chatCard'
+import profilePic from '../../../assets/logo.png'
 
 export const Sidebar = () => {
 
@@ -37,9 +38,9 @@ export const Sidebar = () => {
     handleSidebarClose()
   }
 
-  const handleChatCreate = () => {
+  const handleChatCreate = (type: ChatTypes) => {
     user &&
-      createChat(user.id)
+      createChat({ creatorId: user.id, type: type })
         .unwrap()
         // .then((fullfilled) => console.log(fullfilled))
         .then((fullfilled) => socket.emit('join room', fullfilled.chat_id.toString(), user.id))
@@ -51,11 +52,18 @@ export const Sidebar = () => {
   return (
     <div className={`${cl.sidebar} ${isSidebarOpen ? cl.open : ''}`}>
       <div className={cl.sidebarContent} ref={ref}>
-        <p>{user.username}</p>
-        <Button variant={ButtonVariants.outlined}>new message</Button>
-        <Button variant={ButtonVariants.contained} onClick={handleChatCreate}>new chat</Button>
-        <Button variant={ButtonVariants.contained} onClick={handleSettingsModalOpen}>settings</Button>
-        <Button variant={ButtonVariants.contained} onClick={handleLogout}>logout</Button>
+        <div className={cl.sidebarUserInfo}>
+          <img src={profilePic} alt="profile pic" />
+          <p>{user.username}</p>
+        </div>
+        <div className={cl.sidebarButtons}>
+          <button onClick={() => { }}>my profile</button>
+          <button onClick={() => handleChatCreate(ChatTypes.dm)}>new message</button>
+          <button onClick={() => handleChatCreate(ChatTypes.group)}>new chat</button>
+          <button onClick={handleSettingsModalOpen}>settings</button>
+          <button onClick={handleLogout}>logout</button>
+          <button onClick={() => { }}>night mode</button>
+        </div>
       </div>
     </div>
   )

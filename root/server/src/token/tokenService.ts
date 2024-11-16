@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken'
 import { pool } from '../config/dbConfig'
-import { FieldPacket, QueryResult } from 'mysql2'
+import { QueryResult } from 'pg'
 
 interface TokenData {
     email: string
-    id: string
+    id: number
 }
 
 class TokenService {
@@ -15,24 +15,24 @@ class TokenService {
     }
 
     async saveToken(userId: number, refreshToken: string) {
-        const tokenData = await pool.query('SELECT * FROM token WHERE user_id = ?', [userId])
-        let token: [QueryResult, FieldPacket[]]
-        if (tokenData[0].constructor === Array && tokenData[0].length > 0) {
-            token = await pool.query('UPDATE token SET refresh_token = ? WHERE user_id = ?', [refreshToken, userId])
+        const tokenData = await pool.query('SELECT * FROM token WHERE user_id = $1', [userId])
+        let token: QueryResult<any>
+        if (tokenData.rows.length > 0) {
+            token = await pool.query('UPDATE token SET refresh_token = $1 WHERE user_id = $2', [refreshToken, userId])
         } else {
-            token = await pool.query('INSERT INTO token (user_id, refresh_token) VALUES (?, ?)', [userId, refreshToken])
+            token = await pool.query('INSERT INTO token (user_id, refresh_token) VALUES ($1, $2)', [userId, refreshToken])
         }
 
         return token
     }
 
     async removeToken(refreshToken: string) {
-        await pool.query('DELETE FROM token WHERE refresh_token = ?', [refreshToken])
+        await pool.query('DELETE FROM token WHERE refresh_token = $1', [refreshToken])
     }
 
-    async findToken(refreshToken: string) {
-        const tokenData = await pool.query('SELECT * FROM token WHERE refresh_token = ?', [refreshToken])
-        return tokenData
+    async findToken(refreshToken: string): Promise<{token_id: number, user_id: number, refresh_token: string}> {
+        const tokenData = await pool.query('SELECT * FROM token WHERE refresh_token = $1', [refreshToken])
+        return tokenData as unknown as {token_id: number, user_id: number, refresh_token: string}
     }
 
     validateRefreshToken(refreshToken: string) {

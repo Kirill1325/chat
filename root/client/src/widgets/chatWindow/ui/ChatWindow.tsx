@@ -1,11 +1,12 @@
 import { useAppSelector } from '../../../app/store'
 import cl from './ChatWindow.module.scss'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { socket } from '../../../app/main'
 import { Message } from '../../../entities/message'
 import { userApi } from '../../../entities/user'
 import { MessageItem } from '../../../entities/message/ui/MessageItem'
 import { ChatWindowHeader } from '../../chatWindowHeader'
+import { useClickOutside } from '../../../shared/useOutsideClick'
 
 export const ChatWindow = () => {
 
@@ -21,30 +22,38 @@ export const ChatWindow = () => {
 
     const [isDropdpwnOpen, setIsDropdownOpen] = useState(false)
 
+    // useEffect(() => {
+    //     console.log(messages)
+    // })
+
     const callback = () => {
         setIsDropdownOpen(!isDropdpwnOpen)
     }
 
     useEffect(() => {
-
         currentChatId && message === '' && socket.emit('get messages', currentChatId)
-
         socket.on('receive messages', (messages) => {
             setMessages(messages)
         })
 
     }, [currentChatId, message])
 
+    const ref = useRef<HTMLDivElement>(null)
+    const dummyRef = useRef<HTMLDivElement>(null)
 
     const handleRecieveMessage = () => {
         socket.on('receive message', (message) => {
             setMessages([...messages, message])
-            console.log('handleRecieveMessage ', message)
+            // console.log('handleRecieveMessage ', message)
         })
+        dummyRef.current && dummyRef.current.scrollIntoView({ behavior: 'smooth' })
     }
 
     // TODO: add scroll to bottom when swithing chats
-    const ref = useRef<HTMLDivElement>(null)
+
+    // console.log(ref.current && ref.current.lastElementChild)
+
+    const dropdownRef = useClickOutside(() => setIsDropdownOpen(false))
 
     const handleSendMessage = () => {
         if (message) {
@@ -52,13 +61,17 @@ export const ChatWindow = () => {
             handleRecieveMessage()
             setMessage('')
         }
-        ref.current && ref.current.lastElementChild?.scrollIntoView({ behavior: 'smooth' })
+        // ref.current && ref.current.lastElementChild?.scrollIntoView({ behavior: 'smooth' })
+        // ref.current && ref.current.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+        // if(ref.current) ref.current.scrollTop =  ref.current.scrollHeight
     }
 
-    useEffect(() => {
-        // console.log(currentChatId)
-        ref.current && ref.current.lastElementChild?.scrollIntoView({ behavior: 'smooth' })
-    }, [currentChatId])
+    // useLayoutEffect(() => {
+    //     dummyRef.current && dummyRef.current.scrollIntoView({ behavior: 'smooth' })
+    //     // console.log(ref.current && ref.current.scrollHeight)
+    //     // if(ref.current) ref.current.scrollTop =  ref.current.scrollHeight
+    //     // ref.current && ref.current.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' });
+    // }, [currentChatId])
 
     const handleEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter') {
@@ -79,7 +92,15 @@ export const ChatWindow = () => {
             :
             <div className={`${cl.chatWindow} ${isOpen ? cl.open : ''}`}>
                 <ChatWindowHeader callback={callback} />
-                {currentChatId && <div className={cl.messages} ref={ref}  >{messages && messages.map(message => <MessageItem key={message.message_id} message={message} />)}</div>}
+                {currentChatId &&
+                    <div className={cl.messages} ref={ref}  >
+                        {messages && messages.map(message =>
+                            <MessageItem key={message.messageId} message={message} />
+                        )}
+                        {/* <div className={cl.dummyDiv} ref={dummyRef}>baba</div> */}
+                    </div>
+                }
+
 
                 <div className={cl.inputContainer}>
                     <textarea
@@ -94,8 +115,8 @@ export const ChatWindow = () => {
                         </svg>
                     </button>
                 </div>
-                
-                <div className={`${cl.dropdown} ${isDropdpwnOpen ? cl.open : ''}`}>
+
+                <div className={`${cl.dropdown} ${isDropdpwnOpen ? cl.open : ''}`} ref={dropdownRef}>
                     {users?.map(user => <p key={user.id}>{user.username}</p>)}
                 </div>
 

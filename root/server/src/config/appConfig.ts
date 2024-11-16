@@ -1,10 +1,10 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { authRouter } from '../routes/authRoutes';
 import { errorMiddleware } from '../middleware/errorMiddleware';
-import { chatsRouter } from '../routes/chatsRoutes';
-import { messageRouter } from '../routes/messageRoutes';
+import { messageRouter } from '../messages/messageRoutes';
+import { authRouter } from '../auth/authRoutes';
+import { chatsRouter } from '../chats/chatsRoutes';
 
 export const configure = (app: Application) => {
 

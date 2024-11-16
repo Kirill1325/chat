@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useAppSelector } from "../../../app/store"
 import { ChatCard } from "../../../entities/chatCard"
 import { userApi } from "../../../entities/user"
@@ -13,11 +14,19 @@ export const ChatsList = () => {
 
   const { data: chats } = userApi.useGetChatsQuery(user.id ?? skipToken)
 
+  // useEffect(() => {
+  //   console.log('chats',chats)
+  // }, [chats])
+
+  // useEffect(() => {
+  //   console.log('id',user.id)
+  // }, [user])
+
   return (
     <div className={`${cl.chatsList} ${isOpen ? cl.close : ''}`}>
       <ChatsListHeader />
       <div className={cl.chats}>
-        {chats && chats.map(chat => <ChatCard key={chat.chat_id} chatId={chat.chat_id} />)}
+        {chats && chats.map(chat => <ChatCard key={chat.chat_id} chatId={chat.chat_id} type={chat.type} />)}
       </div>
     </div>
   )

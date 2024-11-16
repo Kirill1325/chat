@@ -6,7 +6,7 @@ import { createTables } from './config/dbConfig';
 // import WebSocket, { WebSocketServer } from 'ws';
 import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from 'uuid';
-import { messageService } from './service/messageService';
+import { messageService } from './messages/messageService';
 
 const PORT = process.env.PORT || 3000
 
@@ -46,8 +46,8 @@ io.on('connection', (socket: Socket) => {
     console.log(userId, chatId, payload, createdAt)
     const sentMessage = await messageService.sendMessage(userId, chatId, payload, createdAt)
 
-    const recievedMessage = await messageService.getMessageById(sentMessage.message_id)
-
+    const recievedMessage = await messageService.getMessageById(sentMessage.messageId)
+    
     socket.emit('receive message', recievedMessage)
   })
 
