@@ -2,7 +2,6 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorMiddleware } from '../middleware/errorMiddleware';
-import { messageRouter } from '../messages/messageRoutes';
 import { authRouter } from '../auth/authRoutes';
 import { chatsRouter } from '../chats/chatsRoutes';
 
@@ -14,7 +13,6 @@ export const configure = (app: Application) => {
         .use(express.json())
         .use('/auth', authRouter)
         .use('/chats', chatsRouter)
-        .use('/messages', messageRouter)
         .use(errorMiddleware)
         .get('/', (req, res: Response, next) => {
             res.send('working');

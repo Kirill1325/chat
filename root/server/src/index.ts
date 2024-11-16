@@ -58,6 +58,14 @@ io.on('connection', (socket: Socket) => {
     socket.emit('receive messages', messages)
   })
 
+  socket.on('delete message', async (messageId: number) => {
+    await messageService.deleteMessage(messageId)
+  })
+
+  socket.on('delete message', async (messageId: number) => {
+    await messageService.deleteMessage(messageId)
+  })
+
   socket.on('disconnect', () => console.log('user disconnected'));
 
 })

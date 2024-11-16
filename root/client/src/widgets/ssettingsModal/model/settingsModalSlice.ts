@@ -9,7 +9,7 @@ const initialState: settingsModalState = {
 }
 
 export const settingsModalSlice = createSlice({
-    name: 'user',
+    name: 'settingsModal',
     initialState,
     reducers: {
         openSettingsModal(state ) {

@@ -33,6 +33,14 @@ class MessageService {
 
     }
 
+    async deleteMessage(messageId: number){
+        await pool.query('DELETE FROM messages WHERE message_id = $1', [messageId])
+    }
+
+    async editMessage(messageId: number, payload: string){
+
+    }
+
 }
 
 export const messageService = new MessageService()
