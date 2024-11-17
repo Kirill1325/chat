@@ -3,7 +3,6 @@ import express from 'express';
 import http from 'http';
 import { configure } from './config/appConfig';
 import { createTables } from './config/dbConfig';
-// import WebSocket, { WebSocketServer } from 'ws';
 import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from 'uuid';
 import { messageService } from './messages/messageService';
@@ -28,7 +27,6 @@ const io = new Server(server, {
   }
 });
 
-
 io.on('connection', (socket: Socket) => {
 
   console.log('a user connected');
@@ -47,7 +45,7 @@ io.on('connection', (socket: Socket) => {
     const sentMessage = await messageService.sendMessage(userId, chatId, payload, createdAt)
 
     const recievedMessage = await messageService.getMessageById(sentMessage.messageId)
-    
+
     socket.emit('receive message', recievedMessage)
   })
 
@@ -56,6 +54,16 @@ io.on('connection', (socket: Socket) => {
     const messages = await messageService.getMessages(chatId)
 
     socket.emit('receive messages', messages)
+  })
+
+  socket.on('delete message', async (messageId: number) => {
+    await messageService.deleteMessage(messageId)
+    socket.emit('delete message', messageId)
+  })
+
+  socket.on('edit message', async (messageId: number, payload: string) => {
+    await messageService.editMessage(messageId, payload)
+    socket.emit('edit message', messageId, payload)
   })
 
   socket.on('disconnect', () => console.log('user disconnected'));

@@ -3,7 +3,6 @@ import cl from './ChatCard.module.scss'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { socket } from '../../../app/main'
 import { changeChatId, setIsOpen } from '../../../widgets/chatWindow/model/chatWindowSlice'
-import { userApi } from '../../user'
 import { useEffect, useState } from 'react'
 import { Message } from '../../message'
 import { ChatTypes } from '../model/types'
@@ -13,7 +12,7 @@ interface ChatCardProps {
     type: ChatTypes
 }
 
-export const ChatCard = ({ chatId, type }: ChatCardProps) => {
+export const ChatCard = ({ chatId }: ChatCardProps) => {
 
     const { user } = useAppSelector(state => state.userSlice)
 
@@ -26,7 +25,7 @@ export const ChatCard = ({ chatId, type }: ChatCardProps) => {
     // const { data: lastUser } = userApi.useGetLastUserQuery(chatId)
 
     const [lastMessage, setLastMessage] = useState('')
-    const [lastUser, setLastUser] = useState('')
+    // const [lastUser, setLastUser] = useState('')
 
     const handleChatChange = () => {
         user && socket.emit('join room', chatId.toString(), user.id)
@@ -62,7 +61,7 @@ export const ChatCard = ({ chatId, type }: ChatCardProps) => {
                 <div className={cl.chatInfo}>
                     {/* <p>type {type}</p> */}
                     <p>id {chatId}</p>
-                    <p>{lastUser}</p>
+                    {/* <p>{lastUser}</p> */}
                     <p>{lastMessage}</p>
                 </div>
 

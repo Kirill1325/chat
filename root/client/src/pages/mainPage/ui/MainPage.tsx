@@ -8,6 +8,7 @@ import cl from './MainPage.module.scss'
 import { userApi } from "../../../entities/user"
 import { useNavigate } from "react-router-dom"
 import { SettingsModal } from "../../../widgets/ssettingsModal"
+import { ContextMenu } from "../../../widgets/contextMenu"
 
 export const MainPage = () => {
 
@@ -34,6 +35,7 @@ export const MainPage = () => {
         <div className={cl.mainPage}>
             <Sidebar />
             <SettingsModal />
+            <ContextMenu/>
             <ChatsList />
             <ChatWindow />
         </div>

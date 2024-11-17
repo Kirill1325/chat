@@ -5,13 +5,15 @@ import userSlice from '../entities/user/model/userSlice'
 import sidebarSlice from '../widgets/sidebar/model/sidebarSlice'
 import settingsModalSlice from '../widgets/ssettingsModal/model/settingsModalSlice'
 import chatWindowSlice from '../widgets/chatWindow/model/chatWindowSlice'
+import contextMenuSlice from '../widgets/contextMenu/model/contextMenuSlice'
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
   userSlice,
   sidebarSlice,
   settingsModalSlice,
-  chatWindowSlice
+  chatWindowSlice,
+  contextMenuSlice
 })
 
 const store = configureStore({

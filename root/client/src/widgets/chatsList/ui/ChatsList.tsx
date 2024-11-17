@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import { useAppSelector } from "../../../app/store"
 import { ChatCard } from "../../../entities/chatCard"
 import { userApi } from "../../../entities/user"
