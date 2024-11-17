@@ -1,8 +1,7 @@
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import cl from './ChatWindow.module.scss'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { socket } from '../../../app/main'
-import { Message } from '../../../entities/message'
 import { userApi } from '../../../entities/user'
 import { MessageItem } from '../../../entities/message/ui/MessageItem'
 import { ChatWindowHeader } from '../../chatWindowHeader'
@@ -20,9 +19,9 @@ export const ChatWindow = () => {
 
     const [message, setMessage] = useState('') //TODO: add debounce to message input
 
-    const ref = useRef<HTMLDivElement>(null)
-    const dummyRef = useRef<HTMLDivElement>(null)
+    const messagesRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLTextAreaElement>(null)
+    const dropdownRef = useClickOutside(() => setIsDropdownOpen(false))
 
     const [isDropdpwnOpen, setIsDropdownOpen] = useState(false)
 
@@ -50,19 +49,15 @@ export const ChatWindow = () => {
         socket.on('receive message', (message) => {
             dispatch(setMessages([...messages, message]))
         })
-        dummyRef.current && dummyRef.current.scrollIntoView({ behavior: 'smooth' })
     }
 
     const handleRecieveEditedMessage = () => {
         socket.on('edit message', (messageId: number, payload: string) => {
             dispatch(setMessages(messages.map(message => message.messageId === messageId ? { ...message, payload } : message)))
         })
-        dummyRef.current && dummyRef.current.scrollIntoView({ behavior: 'smooth' })
     }
 
     // TODO: add scroll to bottom when swithing chats
-
-    const dropdownRef = useClickOutside(() => setIsDropdownOpen(false))
 
     const handleSendMessage = () => {
         if (message) {
@@ -91,7 +86,6 @@ export const ChatWindow = () => {
     const handleCancelEditing = () => {
         setMessage('')
         dispatch(setEditingMessage(null))
-        // inputRef.current && inputRef.current.blur()
     }
 
     return (
@@ -107,11 +101,10 @@ export const ChatWindow = () => {
             <div className={`${cl.chatWindow} ${isOpen ? cl.open : ''}`}>
                 <ChatWindowHeader callback={callback} />
                 {currentChatId &&
-                    <div className={cl.messages} ref={ref}  >
+                    <div className={cl.messages} ref={messagesRef}  >
                         {messages && messages.map(message =>
                             <MessageItem key={message.messageId} message={message} />
                         )}
-                        {/* <div className={cl.dummyDiv} ref={dummyRef}>baba</div> */}
                     </div>
                 }
 

@@ -1,7 +1,7 @@
 import { socket } from '../../../app/main'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { useClickOutside } from '../../../shared/useOutsideClick'
-import { deleteMessage, setEditingMessage, setMessages } from '../../chatWindow/model/chatWindowSlice'
+import { deleteMessage, setEditingMessage } from '../../chatWindow/model/chatWindowSlice'
 import { closeContextMenu } from '../model/contextMenuSlice'
 import cl from './ContextMenu.module.scss'
 
