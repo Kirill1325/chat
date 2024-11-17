@@ -4,7 +4,7 @@ interface CreateChatModalProps {
     type: ChatTypes
 }
 
-export const CreateChatModal = ({type}: CreateChatModalProps) => {
+export const CreateChatModal = ({}: CreateChatModalProps) => {
   return (
     <div>CreateChatModal</div>
   )

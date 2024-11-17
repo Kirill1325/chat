@@ -2,7 +2,6 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { User, Response } from '..'
 import { UpdatePasswordRequest, UserDto } from '../model/types'
 import { ChatType, ChatTypes } from '../../chatCard'
-import { Message } from '../../message'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
