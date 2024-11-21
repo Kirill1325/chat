@@ -1,3 +1,4 @@
+import { convertDate } from '..'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { openContextMenu, setPosition, setSelectedMessage } from '../../../widgets/contextMenu/model/contextMenuSlice'
 import { userApi } from '../../user'
@@ -11,11 +12,6 @@ interface MessageItemProps {
 export const MessageItem = ({ message }: MessageItemProps) => {
 
     const dispatch = useAppDispatch()
-
-    const covertDate = () => {
-        const date = new Date(parseInt(message.createdAt))
-        return date.toLocaleString().slice((10)).slice(1, -3)
-    }
 
     const { user } = useAppSelector(state => state.userSlice)
 
@@ -36,7 +32,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
             {message.senderId !== user.id && <p>{username}</p>}
             <div className={cl.messageContent}>
                 <p>{message.payload}</p>
-                <b>{covertDate()}</b>
+                <b>{convertDate(message)}</b>
             </div>
         </div>
     )

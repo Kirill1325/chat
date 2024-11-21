@@ -1,7 +1,7 @@
 import { socket } from '../../../app/main'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { useClickOutside } from '../../../shared/useOutsideClick'
-import { deleteMessage, setEditingMessage } from '../../chatWindow/model/chatWindowSlice'
+import {  setEditingMessage } from '../../chatWindow/model/chatWindowSlice'
 import { closeContextMenu } from '../model/contextMenuSlice'
 import cl from './ContextMenu.module.scss'
 
@@ -9,6 +9,7 @@ export const ContextMenu = () => {
 
     const dispatch = useAppDispatch()
     const { isContextMenuOpen, messageId, position } = useAppSelector(state => state.contextMenuSlice)
+    const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
 
     const handleClose = () => {
         isContextMenuOpen && dispatch(closeContextMenu())
@@ -17,10 +18,10 @@ export const ContextMenu = () => {
     const ref = useClickOutside(handleClose)
 
     const handleDelteMessage = () => {
-        socket.emit('delete message', messageId)
-        socket.on('delete message', (messageId: number) => {
-            dispatch(deleteMessage(messageId))
-        })
+        socket.emit('delete message', messageId, currentChatId)
+        // socket.on('delete message', (messageId: number) => {
+        //     dispatch(deleteMessage(messageId))
+        // })
         dispatch(closeContextMenu())
     }
 
@@ -28,6 +29,7 @@ export const ContextMenu = () => {
         dispatch(setEditingMessage(messageId))
         dispatch(closeContextMenu())
     }
+    
 
     return (
         position &&

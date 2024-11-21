@@ -6,6 +6,8 @@ import sidebarSlice from '../widgets/sidebar/model/sidebarSlice'
 import settingsModalSlice from '../widgets/ssettingsModal/model/settingsModalSlice'
 import chatWindowSlice from '../widgets/chatWindow/model/chatWindowSlice'
 import contextMenuSlice from '../widgets/contextMenu/model/contextMenuSlice'
+import chatCardSlice from '../entities/chatCard/model/chatCardSlice'
+import chatsListSlice from '../widgets/chatsList/model/chatsListSlice'
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -13,7 +15,9 @@ const rootReducer = combineReducers({
   sidebarSlice,
   settingsModalSlice,
   chatWindowSlice,
-  contextMenuSlice
+  contextMenuSlice,
+  chatCardSlice,
+  chatsListSlice
 })
 
 const store = configureStore({

@@ -8,10 +8,7 @@ enum ChatTypes {
     group = 'group'
 }
 
-
-
-// TODO/ update for postgres
-
+// TODO: make back return everything in camelCase
 class chatsService {
 
     async createChat(creatorId: number, type: ChatTypes): Promise<{ chat_id: number }> {
@@ -25,21 +22,23 @@ class chatsService {
 
     async connectToChat(chatId: number, userId: number) {
         await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, userId])
-
+        // TODO: throw error when user is already in chat
     }
 
-    async getChats(userId: number): Promise<Chat[]> {
+    async getChats(userId: number): Promise<{ chat_id: number }[]> {
 
         const chatMembers: ChatMember[] = (await pool.query('SELECT * FROM chat_members WHERE user_id = $1;', [userId])).rows
-        const chatsIds = chatMembers.map((chat: ChatMember) => chat.chat_id)
+        // console.log('chatMembers ', chatMembers)
+        const result: number[] = chatMembers.map((chat: ChatMember) => chat.chat_id)
+
+        const chatsIds = result.map(id => { return { chat_id: id } })
+        // console.log('chatsIds ', chatsIds)
 
         if (chatsIds.length === 0) {
             return []
         }
 
-        const chats = (await pool.query('SELECT * FROM chats WHERE chat_id = ANY($1::int[]);', [chatsIds])).rows
-
-        return chats
+        return chatsIds
     }
 
     async getLastMessage(chatId: number): Promise<string> {
