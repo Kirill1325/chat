@@ -83,8 +83,8 @@ export const userApi = createApi({
             })
         }),
 
-        createChat: builder.mutation<{ chat_id: number }, { creatorId: number , type: ChatTypes}>({
-            query: ({creatorId, type}) => ({
+        createChat: builder.mutation<{ chat_id: number }, { creatorId: number, type: ChatTypes }>({
+            query: ({ creatorId, type }) => ({
                 url: 'chats/create',
                 method: 'POST',
                 body: { creatorId, type },
@@ -107,27 +107,17 @@ export const userApi = createApi({
             })
         }),
 
-        // getMessagesFromChat: builder.query<Message[], number>({
-        //     query: (chatId) => ({
-        //         url: `messages/get-messages/${chatId}`,
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-        //         },
-        //     })
-        // }),
-
-        // getMessageById: builder.query<Message, number>({
-        //     query: (messageId) => ({
-        //         url: `messages/get-message-by-id/${messageId}`,
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-        //         },
-        //     })
-        // }),
+        connectToChat: builder.mutation<void, { chatId: number, userId: number }>({
+            query: ({ chatId, userId }) => ({
+                url: 'chats/connect',
+                method: 'POST',
+                body: { chatId, userId },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                },
+            })
+        }),
 
         getLastMessage: builder.query<string, number>({
             query: (chatId) => ({

@@ -3,13 +3,12 @@ import cl from './ChatCard.module.scss'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { socket } from '../../../app/main'
 import { changeChatId, setIsOpen } from '../../../widgets/chatWindow/model/chatWindowSlice'
-import { useEffect, useState } from 'react'
-import { Message } from '../../message'
-import { ChatTypes } from '../model/types'
+import { useEffect } from 'react'
+import { setLastMessage } from '../model/chatCardSlice'
+import { convertDate } from '../../message'
 
 interface ChatCardProps {
-    chatId: number,
-    type: ChatTypes
+    chatId: number
 }
 
 export const ChatCard = ({ chatId }: ChatCardProps) => {
@@ -17,15 +16,11 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
     const { user } = useAppSelector(state => state.userSlice)
 
     const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
+    const { chatsLastMessages } = useAppSelector(state => state.chatCardSlice)
 
     const dispatch = useAppDispatch()
 
-    // TODO: remove from userService
-    // const { data: lastSentMessage } = userApi.useGetLastMessageQuery(chatId)
-    // const { data: lastUser } = userApi.useGetLastUserQuery(chatId)
 
-    const [lastMessage, setLastMessage] = useState('')
-    // const [lastUser, setLastUser] = useState('')
 
     const handleChatChange = () => {
         user && socket.emit('join room', chatId.toString(), user.id)
@@ -33,41 +28,30 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
         dispatch(setIsOpen(true))
     }
 
-    const handleRecieveMessage = () => {
-        socket.on('receive message', (message: Message) => {
-            // console.log('message ', message)
-            setLastMessage(message.payload)
-            // setLastUser(message.sender_id)
-        })
-    }
-
     useEffect(() => {
-        handleRecieveMessage()
-        // const interval = setInterval(() => {
-        //     handleRecieveMessage()
-        // }, 100)
-
-        // return () => {
-        //     clearInterval(interval)
-        // }
+        socket.emit('get last message', chatId)
+        socket.on('get last message', (message: { message: string, sender: string, chatId: number, createdAt: string }) => {
+            dispatch(setLastMessage(message))
+        })
     }, [])
 
     return (
-        lastMessage !== undefined && (
+        chatsLastMessages[chatId] !== undefined && (
             <div className={`${cl.chatCard} ${currentChatId === chatId ? cl.active : ''}`} onClick={handleChatChange} >
 
                 <img src={logo} alt='pic' />
 
-                <div className={cl.chatInfo}>
-                    {/* <p>type {type}</p> */}
-                    <p>id {chatId}</p>
-                    {/* <p>{lastUser}</p> */}
-                    <p>{lastMessage}</p>
-                </div>
+                {chatsLastMessages[chatId] &&
+                    <div className={cl.chatInfo}>
+                        <p>id {chatId}</p>
+                        <p>{chatsLastMessages[chatId].sender}</p>
+                        <p>{chatsLastMessages[chatId].message}</p>
+                    </div>
+                }
 
                 <div className={cl.chatTime}>
-                    <p>v</p>
-                    <p>13:00</p>
+                    {/* <p>v</p> TODO: add read/sent logic */}
+                    <p>{convertDate(chatsLastMessages[chatId])}</p>
                 </div>
 
             </div>

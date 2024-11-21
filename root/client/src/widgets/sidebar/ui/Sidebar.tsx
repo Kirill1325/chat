@@ -45,6 +45,7 @@ export const Sidebar = () => {
         // .then((fullfilled) => console.log(fullfilled))
         .then((fullfilled) => socket.emit('join room', fullfilled.chat_id.toString(), user.id))
     refetch()
+    
   }
 
   const ref = useClickOutside(handleSidebarClose)

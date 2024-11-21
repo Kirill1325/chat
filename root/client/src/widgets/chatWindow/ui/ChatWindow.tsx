@@ -6,24 +6,32 @@ import { userApi } from '../../../entities/user'
 import { MessageItem } from '../../../entities/message/ui/MessageItem'
 import { ChatWindowHeader } from '../../chatWindowHeader'
 import { useClickOutside } from '../../../shared/useOutsideClick'
-import { setEditingMessage, setMessages } from '../model/chatWindowSlice'
+import { deleteMessage, editMessage, setEditingMessage, setMessages } from '../model/chatWindowSlice'
 
 export const ChatWindow = () => {
 
     const { currentChatId, isOpen, messages, editingMessageId } = useAppSelector(state => state.chatWindowSlice)
+    // const { chats } = useAppSelector(state => state.chatsListSlice)
 
     const dispatch = useAppDispatch()
 
     const { user } = useAppSelector(state => state.userSlice)
     const { data: users } = userApi.useGetUsersQuery()
 
+    // const [connectToChat] = userApi.useConnectToChatMutation() //TODO: change to ws 
+
     const [message, setMessage] = useState('') //TODO: add debounce to message input
 
     const messagesRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLTextAreaElement>(null)
     const dropdownRef = useClickOutside(() => setIsDropdownOpen(false))
+    const dummyRef = useRef<HTMLDivElement>(null)
 
     const [isDropdpwnOpen, setIsDropdownOpen] = useState(false)
+
+    useEffect(() => {
+        dummyRef.current && dummyRef.current.scrollIntoView({ behavior: 'smooth' })
+    }, [messages])
 
     useEffect(() => {
         editingMessageId && setMessage(messages.find(message => message.messageId === editingMessageId)?.payload ?? '')
@@ -31,7 +39,7 @@ export const ChatWindow = () => {
 
     useEffect(() => {
         currentChatId && message === '' && socket.emit('get messages', currentChatId)
-        socket.on('receive messages', (recievedMessages) => {
+        socket.on('get messages', (recievedMessages) => {
             dispatch(setMessages(recievedMessages))
         })
 
@@ -41,40 +49,52 @@ export const ChatWindow = () => {
         inputRef.current && inputRef.current.focus()
     }, [editingMessageId, currentChatId])
 
+    useEffect(() => {
+        socket.on('send message', (message) => {
+            console.log(message)
+            dispatch(setMessages([...messages, message]))
+        })
+    })
+
+    useEffect(() => {
+        socket.on('edit message', (messageId: number, payload: string) => {
+            dispatch(editMessage({ messageId, payload }))
+        })
+    })
+
+    useEffect(() => {
+        socket.on('delete message', (messageId: number) => {
+            dispatch(deleteMessage(messageId))
+        })
+    })
+
     const callback = () => {
         setIsDropdownOpen(!isDropdpwnOpen)
     }
 
-    const handleRecieveMessage = () => {
-        socket.on('receive message', (message) => {
-            dispatch(setMessages([...messages, message]))
-        })
-    }
-
-    const handleRecieveEditedMessage = () => {
-        socket.on('edit message', (messageId: number, payload: string) => {
-            dispatch(setMessages(messages.map(message => message.messageId === messageId ? { ...message, payload } : message)))
-        })
-    }
-
-    // TODO: add scroll to bottom when swithing chats
-
     const handleSendMessage = () => {
         if (message) {
             socket.emit('send message', user.id, currentChatId, message, Date.now().toString())
-            handleRecieveMessage()
             setMessage('')
         }
+        const timer = setTimeout(() => {
+            socket.emit('get last message', currentChatId)
+        }, 10);
+        return () => clearTimeout(timer);
     }
 
     const handleEditMessage = () => {
         if (message) {
-            socket.emit('edit message', editingMessageId, message)
-            handleRecieveEditedMessage()
+            socket.emit('edit message', editingMessageId, message, currentChatId)
             setMessage('')
         }
         handleCancelEditing()
     }
+
+    const connectToChat = (userId: number) => [
+        console.log('connect to chat', currentChatId, userId),
+        userId !== user.id && socket.emit('connect to chat', currentChatId, userId)
+    ]
 
     const handleEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter') {
@@ -105,6 +125,7 @@ export const ChatWindow = () => {
                         {messages && messages.map(message =>
                             <MessageItem key={message.messageId} message={message} />
                         )}
+                        <div className={cl.dummyDiv} ref={dummyRef}></div>
                     </div>
                 }
 
@@ -141,7 +162,12 @@ export const ChatWindow = () => {
                 </div>
 
                 <div className={`${cl.dropdown} ${isDropdpwnOpen ? cl.open : ''}`} ref={dropdownRef}>
-                    {users?.map(user => <p key={user.id}>{user.username}</p>)}
+                    {users?.map(u =>
+                        u.id !== user.id
+                        && <p key={u.id} onClick={() => connectToChat(u.id)}>
+                            {u.username}
+                        </p>
+                    )}
                 </div>
 
             </div>

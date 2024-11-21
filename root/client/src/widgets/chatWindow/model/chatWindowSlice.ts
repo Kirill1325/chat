@@ -16,7 +16,7 @@ const initialState: chatWindowState = {
 }
 
 export const chatWindowSlice = createSlice({
-    name: 'user',
+    name: 'chatWindow',
     initialState,
     reducers: {
         changeChatId: (state, action) => {
@@ -31,6 +31,9 @@ export const chatWindowSlice = createSlice({
         deleteMessage: (state, action: PayloadAction<number>) => {
             state.messages = state.messages.filter(message => message.messageId !== action.payload)
         },
+        editMessage: (state, action: PayloadAction<{ messageId: number, payload: string }>) => {
+            state.messages = state.messages.map(message => message.messageId === action.payload.messageId ? { ...message, payload: action.payload.payload } : message)
+        },
         setEditingMessage: (state, action: PayloadAction<number | null>) => {
             state.editingMessageId = action.payload
             console.log(current(state))
@@ -40,6 +43,6 @@ export const chatWindowSlice = createSlice({
 
 const { actions, reducer } = chatWindowSlice
 
-export const { changeChatId, setIsOpen, setMessages, deleteMessage, setEditingMessage } = actions
+export const { changeChatId, setIsOpen, setMessages, deleteMessage, editMessage, setEditingMessage } = actions
 
 export default reducer

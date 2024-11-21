@@ -9,6 +9,6 @@ export interface Message {
     sender_id: number
     chat_id: number
     payload: string
-    created_at: number
+    created_at: string
     status: Status
 }

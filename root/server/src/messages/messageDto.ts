@@ -6,7 +6,7 @@ export class MessageDto {
     senderId: number
     chatId: number
     payload: string
-    createdAt: number
+    createdAt: string
     status: Status
 
     constructor(model: Message) {

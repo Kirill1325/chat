@@ -12,7 +12,7 @@ class MessageService {
             [senderId, chatId, payload, createdAt, 'sent']
         )).rows[0].message_id
 
-        console.log('lastSentMessageId ', lastSentMessageId)
+        console.log('lastSentMessageId ', lastSentMessageId, payload)
 
         await pool.query('UPDATE chats SET last_sent_message_id=$1, last_sent_user_id = $2 WHERE chat_id = $3;',
             [lastSentMessageId, senderId, chatId])
@@ -58,7 +58,37 @@ class MessageService {
     }
 
     async editMessage(messageId: number, payload: string) {
-        (await pool.query('UPDATE messages SET payload = $1 WHERE message_id = $2 RETURNING payload', [payload, messageId])).rows[0]
+        await pool.query('UPDATE messages SET payload = $1 WHERE message_id = $2;', [payload, messageId])
+
+    }
+
+    async getLastMessage(chatId: number): Promise<{ message: string, sender: string, chatId: number, createdAt: string }> {
+        const lastMessageId: number = (await pool.query('SELECT last_sent_message_id FROM chats WHERE chat_id = $1', [chatId]))
+            .rows[0].last_sent_message_id
+        // console.log('lastMessageId ', lastMessageId)
+
+        if (lastMessageId) {
+            const lastMessage = await messageService.getMessageById(lastMessageId)
+
+            // console.log('lastMessage ', lastMessage)
+
+            const lastUser = (await pool.query('SELECT * FROM users WHERE id = $1', [lastMessage.senderId])).rows[0]
+
+            return {
+                message: lastMessage.payload,
+                sender: lastUser.username,
+                chatId: chatId,
+                createdAt: lastMessage.createdAt
+            }
+
+        } else {
+            return {
+                message: '',
+                sender: '',
+                chatId: chatId,
+                createdAt: ''
+            }
+        }
 
     }
 

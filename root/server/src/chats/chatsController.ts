@@ -34,23 +34,23 @@ export class ChatsController {
         }
     }
 
-    async getLastMessage(req: Request, res: Response, next: NextFunction) {
-        try {
-            const chatId = req.params['chat_id']
-            const lastMessage = await chatsService.getLastMessage(parseInt(chatId))
-            return res.json(lastMessage)
-        } catch (e) {
-            next(e)
-        }
-    }
+    // async getLastMessage(req: Request, res: Response, next: NextFunction) {
+    //     try {
+    //         const chatId = req.params['chat_id']
+    //         const lastMessage = await chatsService.getLastMessage(parseInt(chatId))
+    //         return res.json(lastMessage)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // }
 
-    async gelLastUser(req: Request, res: Response, next: NextFunction) {
-        try {
-            const chatId = req.params['chat_id']
-            const lastUserMessage = await chatsService.getLastUser(parseInt(chatId))
-            return res.json(lastUserMessage)
-        } catch (e) {
-            next(e)
-        }
-    }
+    // async gelLastUser(req: Request, res: Response, next: NextFunction) {
+    //     try {
+    //         const chatId = req.params['chat_id']
+    //         const lastUserMessage = await chatsService.getLastUser(parseInt(chatId))
+    //         return res.json(lastUserMessage)
+    //     } catch (e) {
+    //         next(e)
+    //     }
+    // }
 }
