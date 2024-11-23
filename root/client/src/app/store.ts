@@ -8,6 +8,7 @@ import chatWindowSlice from '../widgets/chatWindow/model/chatWindowSlice'
 import contextMenuSlice from '../widgets/contextMenu/model/contextMenuSlice'
 import chatCardSlice from '../entities/chatCard/model/chatCardSlice'
 import chatsListSlice from '../widgets/chatsList/model/chatsListSlice'
+import contactsModalSlice from '../widgets/contactsModal/model/contactsModalSlice'
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
   chatWindowSlice,
   contextMenuSlice,
   chatCardSlice,
-  chatsListSlice
+  chatsListSlice,
+  contactsModalSlice
 })
 
 const store = configureStore({

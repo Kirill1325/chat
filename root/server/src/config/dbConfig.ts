@@ -102,7 +102,8 @@ export const createTables = async () => {
     chat_id SERIAL PRIMARY KEY,
     last_sent_message_id integer references messages(message_id),
     last_sent_user_id integer references users(id),
-    type chat_types
+    type chat_types,
+    name VARCHAR(255)
   );`
 
   await pool
