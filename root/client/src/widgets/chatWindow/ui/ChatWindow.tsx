@@ -2,29 +2,22 @@ import { useAppDispatch, useAppSelector } from '../../../app/store'
 import cl from './ChatWindow.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { socket } from '../../../app/main'
-import { userApi } from '../../../entities/user'
 import { MessageItem } from '../../../entities/message/ui/MessageItem'
 import { ChatWindowHeader } from '../../chatWindowHeader'
-import { useClickOutside } from '../../../shared/useOutsideClick'
 import { deleteMessage, editMessage, setEditingMessage, setMessages } from '../model/chatWindowSlice'
 
 export const ChatWindow = () => {
 
     const { currentChatId, isOpen, messages, editingMessageId } = useAppSelector(state => state.chatWindowSlice)
-    // const { chats } = useAppSelector(state => state.chatsListSlice)
 
     const dispatch = useAppDispatch()
 
     const { user } = useAppSelector(state => state.userSlice)
-    const { data: users } = userApi.useGetUsersQuery()
 
-    // const [connectToChat] = userApi.useConnectToChatMutation() //TODO: change to ws 
-
-    const [message, setMessage] = useState('') //TODO: add debounce to message input
+    const [message, setMessage] = useState('')
 
     const messagesRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLTextAreaElement>(null)
-    const dropdownRef = useClickOutside(() => setIsDropdownOpen(false))
     const dummyRef = useRef<HTMLDivElement>(null)
 
     const [isDropdpwnOpen, setIsDropdownOpen] = useState(false)
@@ -40,10 +33,11 @@ export const ChatWindow = () => {
     useEffect(() => {
         currentChatId && message === '' && socket.emit('get messages', currentChatId)
         socket.on('get messages', (recievedMessages) => {
+            console.log('get messages')
             dispatch(setMessages(recievedMessages))
         })
 
-    }, [currentChatId, message])
+    }, [currentChatId])
 
     useEffect(() => {
         inputRef.current && inputRef.current.focus()
@@ -51,9 +45,11 @@ export const ChatWindow = () => {
 
     useEffect(() => {
         socket.on('send message', (message) => {
+            console.log('send message')
             console.log(message)
             dispatch(setMessages([...messages, message]))
         })
+        // TODO: fix when chat is created, messages won't show to sender
     })
 
     useEffect(() => {
@@ -91,11 +87,6 @@ export const ChatWindow = () => {
         handleCancelEditing()
     }
 
-    const connectToChat = (userId: number) => [
-        console.log('connect to chat', currentChatId, userId),
-        userId !== user.id && socket.emit('connect to chat', currentChatId, userId)
-    ]
-
     const handleEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault()
@@ -129,7 +120,6 @@ export const ChatWindow = () => {
                     </div>
                 }
 
-
                 {editingMessageId &&
                     <div className={cl.messageEditInfo}>
                         <label htmlFor="messageInput">edit</label>
@@ -159,15 +149,6 @@ export const ChatWindow = () => {
                             </svg>
                         </button>
                     }
-                </div>
-
-                <div className={`${cl.dropdown} ${isDropdpwnOpen ? cl.open : ''}`} ref={dropdownRef}>
-                    {users?.map(u =>
-                        u.id !== user.id
-                        && <p key={u.id} onClick={() => connectToChat(u.id)}>
-                            {u.username}
-                        </p>
-                    )}
                 </div>
 
             </div>

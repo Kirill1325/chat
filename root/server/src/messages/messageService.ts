@@ -12,7 +12,7 @@ class MessageService {
             [senderId, chatId, payload, createdAt, 'sent']
         )).rows[0].message_id
 
-        console.log('lastSentMessageId ', lastSentMessageId, payload)
+        // console.log('lastSentMessageId ', lastSentMessageId, payload)
 
         await pool.query('UPDATE chats SET last_sent_message_id=$1, last_sent_user_id = $2 WHERE chat_id = $3;',
             [lastSentMessageId, senderId, chatId])
@@ -63,12 +63,12 @@ class MessageService {
     }
 
     async getLastMessage(chatId: number): Promise<{ message: string, sender: string, chatId: number, createdAt: string }> {
-        const lastMessageId: number = (await pool.query('SELECT last_sent_message_id FROM chats WHERE chat_id = $1', [chatId]))
-            .rows[0].last_sent_message_id
+        const lastMessageId = (await pool.query('SELECT last_sent_message_id FROM chats WHERE chat_id = $1', [chatId]))
+            .rows[0]
         // console.log('lastMessageId ', lastMessageId)
 
-        if (lastMessageId) {
-            const lastMessage = await messageService.getMessageById(lastMessageId)
+        if (lastMessageId && lastMessageId.last_sent_message_id !== null) {
+            const lastMessage = await messageService.getMessageById(lastMessageId.last_sent_message_id)
 
             // console.log('lastMessage ', lastMessage)
 

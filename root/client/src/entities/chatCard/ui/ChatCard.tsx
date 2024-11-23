@@ -20,8 +20,6 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
 
     const dispatch = useAppDispatch()
 
-
-
     const handleChatChange = () => {
         user && socket.emit('join room', chatId.toString(), user.id)
         dispatch(changeChatId(chatId))

@@ -6,9 +6,11 @@ import { useNavigate } from 'react-router-dom'
 import { openSettingsModal } from '../../ssettingsModal/model/settingsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
 import { socket } from '../../../app/main'
-import { skipToken } from '@reduxjs/toolkit/query/react'
 import { ChatTypes } from '../../../entities/chatCard'
 import profilePic from '../../../assets/logo.png'
+import { openContactsModal } from '../../contactsModal/model/contactsModalSlice'
+import { changeChatId } from '../../chatWindow/model/chatWindowSlice'
+import { useEffect } from 'react'
 
 export const Sidebar = () => {
 
@@ -16,9 +18,7 @@ export const Sidebar = () => {
   const dispatch = useAppDispatch()
 
   const { user } = useAppSelector(state => state.userSlice)
-  const { refetch } = userApi.useGetChatsQuery(user.id ?? skipToken)
 
-  const [createChat] = userApi.useCreateChatMutation()
   const [logout] = userApi.useLogoutMutation()
 
   const navigate = useNavigate()
@@ -38,15 +38,22 @@ export const Sidebar = () => {
     handleSidebarClose()
   }
 
-  const handleChatCreate = (type: ChatTypes) => {
-    user &&
-      createChat({ creatorId: user.id, type: type })
-        .unwrap()
-        // .then((fullfilled) => console.log(fullfilled))
-        .then((fullfilled) => socket.emit('join room', fullfilled.chat_id.toString(), user.id))
-    refetch()
-    
+  const handleContactsModalOpen = () => {
+    dispatch(openContactsModal())
+    handleSidebarClose()
   }
+
+  const handleChatCreate = (type: ChatTypes) => {
+    user && socket.emit('create chat', user.id, type)
+  }
+
+  useEffect(() => {
+    socket.on('create chat', (chat_id: number) => {
+      socket.emit('join room', chat_id.toString(), user.id)
+      dispatch(changeChatId(chat_id))
+      dispatch(closeSidebar())
+    })
+  })
 
   const ref = useClickOutside(handleSidebarClose)
 
@@ -59,7 +66,7 @@ export const Sidebar = () => {
         </div>
         <div className={cl.sidebarButtons}>
           <button onClick={() => { }}>my profile</button>
-          <button onClick={() => handleChatCreate(ChatTypes.dm)}>new message</button>
+          <button onClick={handleContactsModalOpen}>contacts</button>
           <button onClick={() => handleChatCreate(ChatTypes.group)}>new chat</button>
           <button onClick={handleSettingsModalOpen}>settings</button>
           <button onClick={handleLogout}>logout</button>

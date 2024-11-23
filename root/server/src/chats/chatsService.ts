@@ -3,7 +3,7 @@ import { UserDto } from "../auth/userDto"
 import { Message } from "../messages/types"
 import { Chat, ChatMember } from "./types"
 
-enum ChatTypes {
+export enum ChatTypes {
     dm = 'dm',
     group = 'group'
 }
@@ -11,27 +11,55 @@ enum ChatTypes {
 // TODO: make back return everything in camelCase
 class chatsService {
 
-    async createChat(creatorId: number, type: ChatTypes): Promise<{ chat_id: number }> {
+    async createChat(creatorId: number, type: ChatTypes): Promise<{ chatId: number }> {
 
         const chatId: number = (await pool.query('INSERT INTO chats (type) VALUES ($1) RETURNING chat_id;', [type])).rows[0].chat_id
 
         await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, creatorId])
 
-        return { chat_id: chatId }
+        return { chatId: chatId }
     }
 
-    async connectToChat(chatId: number, userId: number) {
-        await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, userId])
-        // TODO: throw error when user is already in chat
+    // async connectToChat(chatId: number, userId: number) {
+    //     await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, userId])
+    //     // TODO: throw error when user is already in chat
+    // }
+
+    async connectToDm(senderId: number, recipientId: number): Promise<{ chatId: number }> {
+
+        const chatCandidate: number = (await pool
+            .query(`
+                    SELECT chat_id 
+                    FROM chat_members 
+            WHERE user_id IN ($1, $2)
+            GROUP BY chat_id 
+            HAVING COUNT(DISTINCT user_id) = 2;
+            `, [senderId, recipientId]))
+            .rows[0]
+
+        console.log('chatCandidate ', chatCandidate)
+
+        if (chatCandidate) {
+            return { chatId: chatCandidate }
+        }
+
+        const chatId: number = (await pool.query('INSERT INTO chats (type) VALUES ($1) RETURNING chat_id;', ['dm'])).rows[0].chat_id
+
+        console.log('chatId ', chatId)
+        await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, recipientId])
+        await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, senderId])
+
+        return { chatId: chatId }
+
     }
 
-    async getChats(userId: number): Promise<{ chat_id: number }[]> {
+    async getChats(userId: number): Promise<{ chatId: number }[]> {
 
         const chatMembers: ChatMember[] = (await pool.query('SELECT * FROM chat_members WHERE user_id = $1;', [userId])).rows
         // console.log('chatMembers ', chatMembers)
         const result: number[] = chatMembers.map((chat: ChatMember) => chat.chat_id)
 
-        const chatsIds = result.map(id => { return { chat_id: id } })
+        const chatsIds = result.map(id => { return { chatId: id } })
         // console.log('chatsIds ', chatsIds)
 
         if (chatsIds.length === 0) {
@@ -74,3 +102,4 @@ class chatsService {
 }
 
 export default new chatsService()
+

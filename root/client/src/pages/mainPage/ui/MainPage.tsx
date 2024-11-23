@@ -9,6 +9,7 @@ import { userApi } from "../../../entities/user"
 import { useNavigate } from "react-router-dom"
 import { SettingsModal } from "../../../widgets/ssettingsModal"
 import { ContextMenu } from "../../../widgets/contextMenu"
+import { ContactsModal } from "../../../widgets/contactsModal"
 
 export const MainPage = () => {
 
@@ -35,7 +36,8 @@ export const MainPage = () => {
         <div className={cl.mainPage}>
             <Sidebar />
             <SettingsModal />
-            <ContextMenu/>
+            <ContactsModal />
+            <ContextMenu />
             <ChatsList />
             <ChatWindow />
         </div>
