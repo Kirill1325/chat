@@ -3,14 +3,12 @@ import { Message } from "../../../entities/message";
 
 interface chatWindowState {
     currentChatId: number | null,
-    isOpen: boolean,
     messages: Message[],
     editingMessageId: number | null
 }
 
 const initialState: chatWindowState = {
     currentChatId: null,
-    isOpen: false,
     messages: [],
     editingMessageId: null
 }
@@ -21,9 +19,6 @@ export const chatWindowSlice = createSlice({
     reducers: {
         changeChatId: (state, action) => {
             state.currentChatId = action.payload
-        },
-        setIsOpen: (state, action: PayloadAction<boolean>) => {
-            state.isOpen = action.payload
         },
         setMessages: (state, action: PayloadAction<Message[]>) => {
             state.messages = action.payload
@@ -43,6 +38,6 @@ export const chatWindowSlice = createSlice({
 
 const { actions, reducer } = chatWindowSlice
 
-export const { changeChatId, setIsOpen, setMessages, deleteMessage, editMessage, setEditingMessage } = actions
+export const { changeChatId, setMessages, deleteMessage, editMessage, setEditingMessage } = actions
 
 export default reducer

@@ -3,12 +3,11 @@ import cl from './ChatWindow.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { socket } from '../../../app/main'
 import { MessageItem } from '../../../entities/message/ui/MessageItem'
-import { ChatWindowHeader } from '../../chatWindowHeader'
-import { deleteMessage, editMessage, setEditingMessage, setMessages } from '../model/chatWindowSlice'
+import { setEditingMessage } from '../model/chatWindowSlice'
 
 export const ChatWindow = () => {
 
-    const { currentChatId, isOpen, messages, editingMessageId } = useAppSelector(state => state.chatWindowSlice)
+    const { currentChatId, messages, editingMessageId } = useAppSelector(state => state.chatWindowSlice)
 
     const dispatch = useAppDispatch()
 
@@ -20,10 +19,9 @@ export const ChatWindow = () => {
     const inputRef = useRef<HTMLTextAreaElement>(null)
     const dummyRef = useRef<HTMLDivElement>(null)
 
-    const [isDropdpwnOpen, setIsDropdownOpen] = useState(false)
-
     useEffect(() => {
         dummyRef.current && dummyRef.current.scrollIntoView({ behavior: 'smooth' })
+        // TODO: when delete message at the top, it scrolls to bottom, fix
     }, [messages])
 
     useEffect(() => {
@@ -31,42 +29,12 @@ export const ChatWindow = () => {
     }, [editingMessageId])
 
     useEffect(() => {
-        currentChatId && message === '' && socket.emit('get messages', currentChatId)
-        socket.on('get messages', (recievedMessages) => {
-            console.log('get messages')
-            dispatch(setMessages(recievedMessages))
-        })
-
-    }, [currentChatId])
-
-    useEffect(() => {
         inputRef.current && inputRef.current.focus()
     }, [editingMessageId, currentChatId])
 
     useEffect(() => {
-        socket.on('send message', (message) => {
-            console.log('send message')
-            console.log(message)
-            dispatch(setMessages([...messages, message]))
-        })
-        // TODO: fix when chat is created, messages won't show to sender
-    })
-
-    useEffect(() => {
-        socket.on('edit message', (messageId: number, payload: string) => {
-            dispatch(editMessage({ messageId, payload }))
-        })
-    })
-
-    useEffect(() => {
-        socket.on('delete message', (messageId: number) => {
-            dispatch(deleteMessage(messageId))
-        })
-    })
-
-    const callback = () => {
-        setIsDropdownOpen(!isDropdpwnOpen)
-    }
+        currentChatId && message === '' && socket.emit('get messages', currentChatId)
+    }, [currentChatId])
 
     const handleSendMessage = () => {
         if (message) {
@@ -100,17 +68,7 @@ export const ChatWindow = () => {
     }
 
     return (
-
-        currentChatId === null
-            ?
-            <div className={cl.chatWindow}>
-                <div className={cl.chatWindowContent}>
-                    <div>Select a chat</div>
-                </div>
-            </div>
-            :
-            <div className={`${cl.chatWindow} ${isOpen ? cl.open : ''}`}>
-                <ChatWindowHeader callback={callback} />
+            <div className={`${cl.chatWindow} ${currentChatId === null ? '' : cl.open}`}>
                 {currentChatId &&
                     <div className={cl.messages} ref={messagesRef}  >
                         {messages && messages.map(message =>
@@ -126,6 +84,7 @@ export const ChatWindow = () => {
                         <button onClick={handleCancelEditing}>x</button>
                     </div>
                 }
+                {/* move textarea to bottom */}
                 <div className={cl.inputContainer}>
                     <textarea
                         name='messageInput'
