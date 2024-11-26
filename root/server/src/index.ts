@@ -41,56 +41,41 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('send message', async (userId: number, chatId: number, payload: string, createdAt: string) => {
-    console.log(userId, chatId, payload, createdAt)
     const sentMessage = await messageService.sendMessage(userId, chatId, payload, createdAt)
-
     const recievedMessage = await messageService.getMessageById(sentMessage.messageId)
     //TODO: remove getMessageById completely if it's not used anywhere else
     // make messageService.sendMessage return full message
-
     io.sockets.in(chatId.toString()).emit('send message', recievedMessage)
   })
 
   socket.on('get messages', async (chatId: number) => {
-
     const messages = await messageService.getMessages(chatId)
-
     socket.emit('get messages', messages)
   })
 
   socket.on('delete message', async (messageId: number, chatId: number) => {
-
     await messageService.deleteMessage(messageId)
-
     io.sockets.in(chatId.toString()).emit('delete message', messageId)
   })
 
   socket.on('edit message', async (messageId: number, payload: string, chatId: number) => {
-
     await messageService.editMessage(messageId, payload)
-
     io.sockets.in(chatId.toString()).emit('edit message', messageId, payload)
   })
 
   socket.on('get last message', async (chatId: number) => {
     const lastMessage = await messageService.getLastMessage(chatId)
-
     io.sockets.emit('get last message', lastMessage)
   })
 
-  socket.on('create chat', async (creatorId: number, type: ChatTypes) => {
-    const chatId = await chatsService.createChat(creatorId, type)
-    io.sockets.in(chatId.chatId.toString()).emit('create chat', chatId.chatId)
-  })
-
   socket.on('connect to dm', async (senderId: number, recipientId: number) => {
-    const chatId = await chatsService.connectToDm(senderId, recipientId)
-
-    io.sockets.emit('connect to dm', chatId.chatId)
+    const chat = await chatsService.connectToDm(senderId, recipientId)
+    io.sockets.emit('connect to dm', chat)
   })
 
   socket.on('get chats', async (userId: number) => {
     const chats = await chatsService.getChats(userId)
+    // console.log('chats',chats)
     socket.emit('get chats', chats)
   })
 

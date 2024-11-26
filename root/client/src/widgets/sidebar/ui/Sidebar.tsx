@@ -5,11 +5,8 @@ import { userApi } from '../../../entities/user'
 import { useNavigate } from 'react-router-dom'
 import { openSettingsModal } from '../../ssettingsModal/model/settingsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
-import { socket } from '../../../app/main'
-import { ChatTypes } from '../../../entities/chatCard'
 import profilePic from '../../../assets/logo.png'
 import { openContactsModal } from '../../contactsModal/model/contactsModalSlice'
-import { changeChatId } from '../../chatWindow/model/chatWindowSlice'
 import { useEffect } from 'react'
 
 export const Sidebar = () => {
@@ -43,16 +40,17 @@ export const Sidebar = () => {
     handleSidebarClose()
   }
 
-  const handleChatCreate = (type: ChatTypes) => {
-    user && socket.emit('create chat', user.id, type)
+  const handleEscape = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      handleSidebarClose()
+    }
   }
 
   useEffect(() => {
-    socket.on('create chat', (chat_id: number) => {
-      socket.emit('join room', chat_id.toString(), user.id)
-      dispatch(changeChatId(chat_id))
-      dispatch(closeSidebar())
-    })
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+    }
   })
 
   const ref = useClickOutside(handleSidebarClose)
@@ -67,7 +65,9 @@ export const Sidebar = () => {
         <div className={cl.sidebarButtons}>
           <button onClick={() => { }}>my profile</button>
           <button onClick={handleContactsModalOpen}>contacts</button>
-          <button onClick={() => handleChatCreate(ChatTypes.group)}>new chat</button>
+          <button
+          // onClick={() => handleChatCreate(ChatTypes.group)}
+          >new chat</button>
           <button onClick={handleSettingsModalOpen}>settings</button>
           <button onClick={handleLogout}>logout</button>
           <button onClick={() => { }}>night mode</button>

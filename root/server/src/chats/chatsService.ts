@@ -20,53 +20,75 @@ class chatsService {
         return { chatId: chatId }
     }
 
-    // async connectToChat(chatId: number, userId: number) {
-    //     await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, userId])
-    //     // TODO: throw error when user is already in chat
-    // }
+    async connectToDm(senderId: number, recipientId: number): Promise<{ chatId: number, members: UserDto[] }> {
 
-    async connectToDm(senderId: number, recipientId: number): Promise<{ chatId: number }> {
-
-        const chatCandidate: number = (await pool
+        const chatCandidate: { chat_id: number } = (await pool
             .query(`
-                    SELECT chat_id 
-                    FROM chat_members 
+            SELECT chat_id 
+            FROM chat_members 
             WHERE user_id IN ($1, $2)
             GROUP BY chat_id 
             HAVING COUNT(DISTINCT user_id) = 2;
             `, [senderId, recipientId]))
             .rows[0]
 
-        console.log('chatCandidate ', chatCandidate)
 
         if (chatCandidate) {
-            return { chatId: chatCandidate }
+            const usersIds: number[] = (await pool
+                .query('SELECT * FROM chat_members WHERE chat_id = $1;', [chatCandidate.chat_id]))
+                .rows.map((user: { user_id: number }) => user.user_id)
+
+            const users = (await pool.query('SELECT * FROM users WHERE id = ANY($1::int[])', [usersIds]))
+                .rows.map((user: any) => new UserDto(user))
+
+            return { chatId: chatCandidate.chat_id, members: users }
         }
 
         const chatId: number = (await pool.query('INSERT INTO chats (type) VALUES ($1) RETURNING chat_id;', ['dm'])).rows[0].chat_id
 
-        console.log('chatId ', chatId)
         await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, recipientId])
         await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, senderId])
 
-        return { chatId: chatId }
+        const users = (await pool
+            .query('SELECT * FROM users WHERE id = ANY($1::int[])', [[senderId, recipientId]]))
+            .rows.map((user: any) => new UserDto(user))
+
+        return { chatId: chatId, members: users }
 
     }
 
-    async getChats(userId: number): Promise<{ chatId: number }[]> {
+    async getChats(userId: number): Promise<{ chatId: number, members: UserDto[] }[]> {
 
-        const chatMembers: ChatMember[] = (await pool.query('SELECT * FROM chat_members WHERE user_id = $1;', [userId])).rows
-        // console.log('chatMembers ', chatMembers)
-        const result: number[] = chatMembers.map((chat: ChatMember) => chat.chat_id)
+        const query = `
+            SELECT 
+                cm.chat_id,
+                json_agg(json_build_object('email', u.email, 'username', u.username, 'id', u.id)) AS members
+            FROM 
+                chat_members cm
+            JOIN 
+                users u ON cm.user_id = u.id
+            WHERE 
+                cm.chat_id IN (
+                    SELECT DISTINCT chat_id 
+                    FROM chat_members 
+                    WHERE user_id = $1
+                )
+            GROUP BY 
+                cm.chat_id
+        `
 
-        const chatsIds = result.map(id => { return { chatId: id } })
-        // console.log('chatsIds ', chatsIds)
+        const result: { chat_id: number, members: any[] }[] = (await pool.query(query, [userId])).rows
 
-        if (chatsIds.length === 0) {
-            return []
-        }
+        console.log('result', result)
 
-        return chatsIds
+        const chats = result.map(row => ({
+            chatId: row.chat_id,
+            members: row.members.map((member: any) => new UserDto(member)),
+        }))
+
+        console.log('chats', chats)
+
+        return chats
     }
 
     async getLastMessage(chatId: number): Promise<string> {

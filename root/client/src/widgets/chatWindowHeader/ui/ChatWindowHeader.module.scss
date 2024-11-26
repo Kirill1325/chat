@@ -1,19 +1,22 @@
 @import '../../../shared/vars.scss';
 
+
+
 .chatWindowHeader {
-    height: 5rem;
+    flex-basis: 8%;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-direction: row-reverse;
     padding: 0 1em;
     border-bottom: 1px solid #464646;
     background-color: $secondary;
 
-    >div {
+    >.backButton,
+    .searchButton {
+        flex-basis: 20%;
         display: flex;
-        gap: 1em;
+        align-items: center;
 
         >button {
             border: none;
@@ -25,16 +28,18 @@
         }
     }
 
-    >button {
-        border: none;
-        outline: none;
-        background: transparent;
-        width: 2em;
-        height: 2em;
-        cursor: pointer;
+    >p {
+        flex-basis: 75%;
+    }
 
+    >.backButton{
         @media screen and (min-width: 640px) {
             display: none;
         }
     }
+
+    >.searchButton {
+        flex-basis: 5%;
+    }
+
 }

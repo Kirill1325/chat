@@ -20,7 +20,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     const username = users && users.find(user => user.id === message.senderId)?.username
 
     const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        // console.log(e.clientX, e.clientY)
         e.preventDefault()
         dispatch(setPosition({ x: e.clientX, y: e.clientY }))
         dispatch(setSelectedMessage(message.messageId))

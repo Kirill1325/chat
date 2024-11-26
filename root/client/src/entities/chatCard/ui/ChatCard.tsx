@@ -2,7 +2,7 @@ import logo from '../../../assets/logo.png'
 import cl from './ChatCard.module.scss'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { socket } from '../../../app/main'
-import { changeChatId, setIsOpen } from '../../../widgets/chatWindow/model/chatWindowSlice'
+import { changeChatId } from '../../../widgets/chatWindow/model/chatWindowSlice'
 import { useEffect } from 'react'
 import { setLastMessage } from '../model/chatCardSlice'
 import { convertDate } from '../../message'
@@ -14,16 +14,17 @@ interface ChatCardProps {
 export const ChatCard = ({ chatId }: ChatCardProps) => {
 
     const { user } = useAppSelector(state => state.userSlice)
-
     const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
     const { chatsLastMessages } = useAppSelector(state => state.chatCardSlice)
+    const { chats } = useAppSelector(state => state.chatsListSlice)
+
+    const username = chats.find(c => c.chatId === chatId)?.members.find(m => m.id !== user.id)?.username
 
     const dispatch = useAppDispatch()
 
     const handleChatChange = () => {
-        user && socket.emit('join room', chatId.toString(), user.id)
+        user && currentChatId !== chatId && socket.emit('join room', chatId.toString(), user.id)
         dispatch(changeChatId(chatId))
-        dispatch(setIsOpen(true))
     }
 
     useEffect(() => {
@@ -41,9 +42,9 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
 
                 {chatsLastMessages[chatId] &&
                     <div className={cl.chatInfo}>
-                        <p>id {chatId}</p>
-                        <p>{chatsLastMessages[chatId].sender}</p>
+                        <p>{username}</p>
                         <p>{chatsLastMessages[chatId].message}</p>
+                        {/* <p>{chatsLastMessages[chatId].sender}</p> */}
                     </div>
                 }
 

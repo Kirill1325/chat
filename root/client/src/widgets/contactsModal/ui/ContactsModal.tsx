@@ -4,9 +4,6 @@ import { closeContactsModal } from '../model/contactsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
 import cl from './ContactsModal.module.scss'
 import { socket } from '../../../app/main'
-import { useEffect } from 'react'
-import { changeChatId } from '../../chatWindow/model/chatWindowSlice'
-import { setChats } from '../../chatsList/model/chatsListSlice'
 
 export const ContactsModal = () => {
 
@@ -14,11 +11,6 @@ export const ContactsModal = () => {
 
     const dispatch = useAppDispatch()
     const { isContactsModalOpen } = useAppSelector(state => state.contactsModalSlice)
-    const { chats } = useAppSelector(state => state.chatsListSlice)
-
-    useEffect(() => {
-        console.log('chats', chats)
-    }, [chats])
 
     const { user } = useAppSelector(state => state.userSlice)
 
@@ -28,19 +20,9 @@ export const ContactsModal = () => {
 
     const ref = useClickOutside(handleClose)
 
-    useEffect(() => {
-        // console.log('trigger')
-        socket.on('connect to dm', (chatId: number) => {
-            // console.log(chatId)
-            // console.log('connect to dm', chatId)
-            dispatch(changeChatId(chatId))
-            dispatch(setChats([...chats, {chatId: chatId}]))
-        })
-    })
-
     const connectToDm = (userId: number) => {
         socket.emit('connect to dm', user.id, userId)
-        console.log('emit connect to dm')
+        user.id && socket.emit('get chats', user.id)
         dispatch(closeContactsModal())
     }
 

@@ -10,6 +10,7 @@ import { MainPage } from '../pages/mainPage';
 import { io } from 'socket.io-client';
 
 export const socket = io(import.meta.env.VITE_SERVER_URL, {
+  // autoConnect: false,
   extraHeaders: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,

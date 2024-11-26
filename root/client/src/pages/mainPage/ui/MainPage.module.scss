@@ -1,4 +1,39 @@
 .mainPage {
     display: flex;
+    flex-direction: column;
     min-height: 100vh;
+
+    >.chatsList,
+    .chatWindow {
+        display: none;
+    }
+
+    >.selectChatTab{
+        width: 70vw;
+        text-align: center;
+        padding-top: 30vh;
+    }
+
+    .open {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    @media screen and (min-width: 640px) {
+        flex-direction: row;
+
+        >.chatsList {
+            display: flex;
+            flex-direction: column;
+            max-height: 100vh;
+        }
+
+        >.chatWindow {
+            display: flex;
+            flex-direction: column;
+            max-height: 100vh;
+        }
+    }
+
 }
