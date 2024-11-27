@@ -8,6 +8,7 @@ import { useClickOutside } from '../../../shared/useOutsideClick'
 import { closeSettingsModal } from '../model/settingsModalSlice'
 import cl from './SettingsModal.module.scss'
 import { userApi } from '../../../entities/user';
+import { useEffect } from 'react';
 
 export const SettingsModal = () => {
 
@@ -50,8 +51,21 @@ export const SettingsModal = () => {
 
     const ref = useClickOutside(handleSettingsModalClose)
 
+    const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+            handleSettingsModalClose()
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleEscape)
+        return () => {
+            document.removeEventListener('keydown', handleEscape)
+        }
+    })
+
     return (
-        <div className={`${cl.settingsModal} ${isSettingsModalOpen ? cl.open : ''}`}>
+        <div className={`${cl.settingsModal} ${isSettingsModalOpen ? cl.open : ''}`} onClick={e => e.stopPropagation()}>
             <div className={cl.settingsModalContent} ref={ref}>
                 <p>{user.username}</p>
                 <p>{user.email}</p>

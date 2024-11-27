@@ -56,7 +56,6 @@ export const MainPage = () => {
 
     useEffect(() => {
         socket.on('get chats', (chats: { chatId: number, members: UserDto[] }[]) => {
-            console.log(chats)
             dispatch(setChats(chats))
         })
 

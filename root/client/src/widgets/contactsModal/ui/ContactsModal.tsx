@@ -4,6 +4,7 @@ import { closeContactsModal } from '../model/contactsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
 import cl from './ContactsModal.module.scss'
 import { socket } from '../../../app/main'
+import { useEffect } from 'react'
 
 export const ContactsModal = () => {
 
@@ -26,8 +27,22 @@ export const ContactsModal = () => {
         dispatch(closeContactsModal())
     }
 
+    const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+            handleClose()
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('keydown', handleEscape)
+        return () => {
+            document.removeEventListener('keydown', handleEscape)
+        }
+    })
+
+
     return (
-        <div className={`${cl.contactsModal} ${isContactsModalOpen ? cl.open : ''}`}>
+        <div className={`${cl.contactsModal} ${isContactsModalOpen ? cl.open : ''}`} onClick={e => e.stopPropagation()}>
             <div className={cl.contactsModalContent} ref={ref}>
                 <div className={cl.contactsModalHeader}>
                     <h3>Contacts</h3>
