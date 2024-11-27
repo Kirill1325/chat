@@ -28,11 +28,20 @@
         }
     }
 
-    >p {
+    >.user {
         flex-basis: 75%;
+        display: flex;
+        align-items: center;
+        gap: .5em;
+
+        >img {
+            width: 2em;
+            height: 2em;
+            border-radius: 50%;
+        }
     }
 
-    >.backButton{
+    >.backButton {
         @media screen and (min-width: 640px) {
             display: none;
         }

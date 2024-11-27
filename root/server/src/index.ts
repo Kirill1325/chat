@@ -27,6 +27,7 @@ const io = new Server(server, {
   }
 });
 
+// TODO: add reconnect
 io.on('connection', (socket: Socket) => {
 
   console.log('a user connected');

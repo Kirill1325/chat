@@ -1,0 +1,35 @@
+@import '../../../shared/vars.scss';
+
+.inputContainer {
+    position: relative;
+    height: 3em;
+
+    >textarea {
+        resize: none;
+        overflow: auto;
+        background: $secondary;
+        border: none;
+        outline: none;
+        width: 100%;
+        height: 100%;
+        font-size: 1.3em;
+        padding: .5em 1.5em .5em 1em;
+    }
+
+    >button {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        height: 2em;
+        width: 2em;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: black;
+        background: transparent;
+        outline: none;
+        border: none;
+    }
+}

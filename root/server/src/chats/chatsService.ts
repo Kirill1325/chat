@@ -79,14 +79,14 @@ class chatsService {
 
         const result: { chat_id: number, members: any[] }[] = (await pool.query(query, [userId])).rows
 
-        console.log('result', result)
+        // console.log('result', result)
 
         const chats = result.map(row => ({
             chatId: row.chat_id,
             members: row.members.map((member: any) => new UserDto(member)),
         }))
 
-        console.log('chats', chats)
+        // console.log('chats', chats)
 
         return chats
     }

@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { changeChatId } from '../../chatWindow/model/chatWindowSlice'
 import cl from './ChatWindowHeader.module.scss'
+import logo from '../../../assets/logo.png'
 
 export const ChatWindowHeader = () => {
 
@@ -22,7 +23,10 @@ export const ChatWindowHeader = () => {
                     </svg>
                 </button>
             </div>
-            <p>{username}</p>
+            <div className={cl.user}>
+                <img src={logo} alt='pic' />
+                <p>{username}</p>
+            </div>
             <div className={cl.searchButton}>
                 <button >
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -1,19 +1,12 @@
 @import '../../../shared/vars.scss';
 
 .chatWindow {
-    flex-basis: 92%;
     display: none;
-    width: 100vw;
-    max-height: 100vh;
-    flex-direction: column;
-    overflow: hidden;
-
+    
     @media screen and (min-width: 640px) {
         width: 70vw;
         max-height: 100vh;
         display: flex;
-        flex-direction: column;
-        overflow: hidden;
     }
 
     >.messages {
@@ -24,8 +17,8 @@
         padding: .5em .5em 0 .5em;
 
         >.dummyDiv {
-            width: 100%;
-            height: 1em;
+            width: 0;
+            height: 0;
         }
 
     }
@@ -45,41 +38,6 @@
         }
     }
 
-    >.inputContainer {
-        position: relative;
-        height: 3em;
-
-        >textarea {
-            resize: none;
-            overflow: auto;
-            background: $secondary;
-            border: none;
-            outline: none;
-            width: 100%;
-            height: 100%;
-            font-size: 1.3em;
-            padding: .5em 1.5em .5em 1em;
-        }
-
-        >button {
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            height: 2em;
-            width: 2em;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: black;
-
-            background: transparent;
-            outline: none;
-            border: none;
-        }
-    }
-
     >.dropdown {
         display: none;
 
@@ -95,10 +53,10 @@
 }
 
 .open {
+    flex-basis: 92%;
     display: flex;
-    width: 100vw;
-    max-height: 100vh;
     flex-direction: column;
+    width: 100vw;
     overflow: hidden;
 
     @media screen and (min-width: 640px) {
