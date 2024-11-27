@@ -15,11 +15,10 @@ export const ChatWindow = () => {
     const [message, setMessage] = useState('')
 
     const messagesRef = useRef<HTMLDivElement>(null)
-    const dummyRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        dummyRef.current && dummyRef.current.scrollIntoView({ behavior: 'smooth' })
-        // TODO: when delete message at the top, it scrolls to bottom, fix
+        messagesRef.current && messagesRef.current.scrollTo({ top: messagesRef.current.scrollHeight, left: 0, behavior: 'smooth' })
+        // TODO: when delete and edit message at the top, it scrolls to bottom, fix
     }, [messages])
 
     useEffect(() => {
@@ -42,7 +41,6 @@ export const ChatWindow = () => {
                     {messages && messages.map(message =>
                         <MessageItem key={message.messageId} message={message} />
                     )}
-                    <div className={cl.dummyDiv} ref={dummyRef}></div>
                 </div>
             }
 
@@ -52,7 +50,7 @@ export const ChatWindow = () => {
                     <button onClick={handleCancelEditing}>x</button>
                 </div>
             }
-            
+
             <MessageField message={message} setMessage={setMessage} handleCancelEditing={handleCancelEditing} />
         </div>
 
