@@ -1,17 +1,27 @@
+@import '../../../shared/vars.scss';
+
 .contactsModal {
     display: none;
 
     >.contactsModalContent {
+        display: flex;
+        flex-direction: column;
         width: 35vw;
         height: 50vh;
-        background-color: rgb(23, 33, 43);
-        padding: .5em;
+        background-color: $secondary;
+        border-radius: 1vmax;
+        position: relative;
+        overflow: hidden;
 
         >.contactsModalHeader {
             display: flex;
             justify-content: space-between;
+            margin: .5em;
 
             >button {
+                position: absolute;
+                top: .8em;
+                right: 1em;
                 border: none;
                 outline: none;
                 background: transparent;
@@ -19,18 +29,66 @@
             }
         }
 
-        >.contacts {
+        >.searchContainer {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            // margin: .3em -.5em;
 
-            >p {
-                cursor: pointer;
+            >input {
                 width: 100%;
                 height: 2em;
+                border: none;
+                border-bottom: .1em solid rgb(0, 0, 0);
+                outline: none;
+                background: transparent;
+                padding: .5em 2.5em;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            >label {
+                position: absolute;
+                left: .7em;
+                top: calc(50% - .5em);
+                width: 1em;
+                height: 1em;
+            }
+        }
+
+        >.contacts {
+            // overflow-y: scroll; //TODO: add scroll
+
+            >.contact {
                 display: flex;
                 align-items: center;
                 padding: .5em;
+                gap: .5em;
+                cursor: pointer;
 
                 &:hover {
-                    background-color: rgb(148, 148, 148);
+                    background-color: $hover;
+                }
+
+                >img {
+                    width: 2em;
+                    height: 2em;
+                    border-radius: 50%;
+                }
+
+                >.user {
+
+                    >.username {
+                        width: 100%;
+                        height: 1em;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    >.online {
+                        font-size: .7em;
+                        color: rgb(46, 99, 198);
+                    }
                 }
             }
         }
@@ -50,4 +108,5 @@
     overflow: auto;
     background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
+
 }

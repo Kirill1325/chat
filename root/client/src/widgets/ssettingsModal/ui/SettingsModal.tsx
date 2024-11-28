@@ -65,8 +65,8 @@ export const SettingsModal = () => {
     })
 
     return (
-        <div className={`${cl.settingsModal} ${isSettingsModalOpen ? cl.open : ''}`} onClick={e => e.stopPropagation()}>
-            <div className={cl.settingsModalContent} ref={ref}>
+        <div className={`${cl.settingsModal} ${isSettingsModalOpen ? cl.open : ''}`} >
+            <div className={cl.settingsModalContent} ref={ref} >
                 <p>{user.username}</p>
                 <p>{user.email}</p>
                 <Button variant={ButtonVariants.outlined}>change photo</Button>
@@ -76,7 +76,7 @@ export const SettingsModal = () => {
 
                     <label htmlFor='oldPassword'>Enter prev password</label>
                     <Input
-                        // type="password"
+                        type="password"
                         id="oldPassword"
                         name="oldPassword"
                         placeholder="oldPassword"

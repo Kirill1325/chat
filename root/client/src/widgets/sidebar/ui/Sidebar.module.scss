@@ -1,3 +1,5 @@
+@import '../../../shared/vars.scss';
+
 .sidebar {
     display: none;
 
@@ -34,7 +36,7 @@
                 height: 3em;
 
                 &:hover {
-                    background: rgb(140, 140, 140); //TODO: change color
+                    background: $hover; //TODO: change color
                 }
             }
         }

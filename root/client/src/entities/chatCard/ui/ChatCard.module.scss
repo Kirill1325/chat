@@ -1,4 +1,6 @@
-.chatCard{
+@import '../../../shared/vars.scss';
+
+.chatCard {
     display: flex;
     align-items: center;
     padding: .7em;
@@ -6,27 +8,35 @@
     border-top: 1px solid #464646;
     cursor: pointer;
 
-    >img{
+    &:hover {
+        background-color: $hover;
+    }
+
+    >img {
         width: 50px;
         height: auto;
         border-radius: 50%;
         flex-basis: 10%;
     }
 
-    >.chatInfo{
+    >.chatInfo {
         display: flex;
         flex-direction: column;
         flex-basis: 70%;
         padding-left: 1em;
     }
 
-    >.chatTime{
+    >.chatTime {
         display: flex;
         gap: .5em;
         flex-basis: 20%;
     }
 }
 
-.active{
+.active {
     background-color: rgb(43, 96, 149);
+
+    &:hover {
+        background-color: rgb(43, 96, 149);
+    }
 }

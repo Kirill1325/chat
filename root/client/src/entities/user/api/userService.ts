@@ -14,9 +14,9 @@ export const userApi = createApi({
 
     endpoints: (builder) => ({
 
-        getUsers: builder.query<Omit<UserDto, 'email'>[], void>({
-            query: () => ({
-                url: 'auth/users',
+        getUsers: builder.query<Omit<UserDto, 'email'>[], string>({
+            query: (searchQuery) => ({
+                url: `auth/users?query=${searchQuery}`,
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

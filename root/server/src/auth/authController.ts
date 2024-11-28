@@ -77,7 +77,8 @@ export class AuthController {
 
     async getUsers(req: Request, res: Response) {
         try {
-            const users = await authService.getUsers()
+            const query = req.query.query as string
+            const users = await authService.getUsers(query)
             return res.json(users)
         } catch (e) {
             res.json(e)
@@ -89,10 +90,10 @@ export class AuthController {
         // TODO: add mail letter that updates password
         try {
 
-            const {oldPassword, newPassword } = req.body
+            const { oldPassword, newPassword } = req.body
             const { refreshToken } = req.cookies
 
-            const user = await authService.changePassword(oldPassword,newPassword, refreshToken)
+            const user = await authService.changePassword(oldPassword, newPassword, refreshToken)
 
             return res.json(user)
         } catch (e) {

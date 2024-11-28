@@ -15,7 +15,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
 
     const { user } = useAppSelector(state => state.userSlice)
 
-    const { data: users } = userApi.useGetUsersQuery() //TOOO: fetch only users that are in chat
+    const { data: users } = userApi.useGetUsersQuery('') //TOOO: fetch only users that are in chat
 
     const username = users && users.find(user => user.id === message.senderId)?.username
 
