@@ -27,6 +27,8 @@ export const MainPage = () => {
     const { chats } = useAppSelector(state => state.chatsListSlice)
     const { currentChatId, messages } = useAppSelector(state => state.chatWindowSlice)
     const { isSidebarOpen } = useAppSelector(state => state.sidebarSlice)
+    const { isContactsModalOpen } = useAppSelector(state => state.contactsModalSlice)
+    const { isSettingsModalOpen } = useAppSelector(state => state.settingsModalSlice)
 
     const dispatch = useAppDispatch()
 
@@ -105,7 +107,7 @@ export const MainPage = () => {
     })
 
     const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !isSidebarOpen) {
+        if (e.key === 'Escape' && !isSidebarOpen && !isContactsModalOpen && !isSettingsModalOpen) {
             dispatch(changeChatId(null))
         }
     }

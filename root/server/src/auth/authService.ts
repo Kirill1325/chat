@@ -104,7 +104,7 @@ class AuthService {
         }
     }
 
-    async getUsers(): Promise<User[]> {
+    async getUsers(searchQuery: string): Promise<User[]> {
 
         const users = (await pool.query('SELECT * FROM users')).rows
 
@@ -117,7 +117,12 @@ class AuthService {
             delete user.role
         })
 
-        return users as User[]
+        if (searchQuery !== undefined) {
+            return (searchQuery.length > 0
+                ? users.filter(user => user.username.toLowerCase().match(searchQuery.toLowerCase())) as User[]
+                : users as User[]
+            )
+        }
     }
 
     // TODO: update for postgres
