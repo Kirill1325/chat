@@ -101,4 +101,16 @@ export class AuthController {
         }
     }
 
+    async uploadPicture(req: Request, res: Response, next: NextFunction) {
+        try {
+            const avatar = req.file
+
+            console.log(avatar)
+
+            res.sendStatus(200);
+        } catch (e) {
+            next(e)
+        }
+    }
+
 }

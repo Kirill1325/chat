@@ -167,6 +167,10 @@ class AuthService {
         }
     }
 
+    async uploadPicture() {
+
+    }
+
 }
 
 export const authService = new AuthService()

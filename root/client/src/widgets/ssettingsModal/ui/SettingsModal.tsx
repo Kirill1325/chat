@@ -8,7 +8,7 @@ import { useClickOutside } from '../../../shared/useOutsideClick'
 import { closeSettingsModal } from '../model/settingsModalSlice'
 import cl from './SettingsModal.module.scss'
 import { userApi } from '../../../entities/user';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const SettingsModal = () => {
 
@@ -45,8 +45,32 @@ export const SettingsModal = () => {
 
     const dispatch = useAppDispatch()
 
+    const [file, setFile] = useState<{picturePreview: string, pictureAsFile: File} | null>(null);
+    const [uploadPicture] = userApi.useUploadPictureMutation()
+
+    useEffect(() => {
+        console.log(file)
+    }, [file])
+
+    const setPic = (e: React.ChangeEvent<HTMLInputElement>) => {
+       e.target.files && setFile({
+            picturePreview: URL.createObjectURL(e.target.files[0]),
+            pictureAsFile: e.target.files[0],
+        });
+    }
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        const formData = new FormData()
+        console.log('file', file)
+        file && formData.append("avatar", file.pictureAsFile)
+        console.log(formData)
+        uploadPicture(formData)
+    }
+
     const handleSettingsModalClose = () => {
         isSettingsModalOpen && dispatch(closeSettingsModal())
+        setFile(null)
     }
 
     const ref = useClickOutside(handleSettingsModalClose)
@@ -69,7 +93,11 @@ export const SettingsModal = () => {
             <div className={cl.settingsModalContent} ref={ref} >
                 <p>{user.username}</p>
                 <p>{user.email}</p>
-                <Button variant={ButtonVariants.outlined}>change photo</Button>
+                <form action="/set-picture" method="POST" encType="multipart/form-data" onSubmit={(e) => handleSubmit(e)}>
+                    <input type='file' name='avatar' id='avatar' onChange={(e) => setPic(e)} />
+                    <button type='submit'>send</button>
+                </form>
+                <img src={file?.picturePreview} alt='avatar'/>
                 <Button variant={ButtonVariants.outlined}>change password</Button>
 
                 <form onSubmit={formik.handleSubmit}>
