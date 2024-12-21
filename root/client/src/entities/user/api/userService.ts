@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { User, Response } from '..'
 import { UpdatePasswordRequest, UserDto } from '../model/types'
-import { ChatType, ChatTypes } from '../../chatCard'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
@@ -83,29 +82,18 @@ export const userApi = createApi({
             })
         }),
 
-        createChat: builder.mutation<{ chat_id: number }, { creatorId: number, type: ChatTypes }>({
-            query: ({ creatorId, type }) => ({
-                url: 'chats/create',
-                method: 'POST',
-                body: { creatorId, type },
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                },
-            })
+        // createChat: builder.mutation<{ chat_id: number }, { creatorId: number, type: ChatTypes }>({
+        //     query: ({ creatorId, type }) => ({
+        //         url: 'chats/create',
+        //         method: 'POST',
+        //         body: { creatorId, type },
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+        //         },
+        //     })
 
-        }),
-
-        getChats: builder.query<ChatType[], number>({
-            query: (userId) => ({
-                url: `chats/${userId}`,
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                },
-            })
-        }),
+        // }),
 
         connectToChat: builder.mutation<void, { chatId: number, userId: number }>({
             query: ({ chatId, userId }) => ({

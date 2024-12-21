@@ -76,7 +76,6 @@ io.on('connection', (socket: Socket) => {
 
   socket.on('get chats', async (userId: number) => {
     const chats = await chatsService.getChats(userId)
-    // console.log('chats',chats)
     socket.emit('get chats', chats)
   })
 

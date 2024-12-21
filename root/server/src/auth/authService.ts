@@ -13,8 +13,6 @@ class AuthService {
 
     async registration(username: string, email: string, password: string) {
 
-        // console.log(username, email, password)
-
         if (!username || !email || !password) {
             throw ApiError.BadRequest('Username, email and password are required')
         }
@@ -85,7 +83,6 @@ class AuthService {
         }
 
         const userData = tokenService.validateRefreshToken(refreshToken)
-        // console.log(userData)
 
         const tokenFromDb = await tokenService.findToken(refreshToken)
 
@@ -108,8 +105,6 @@ class AuthService {
 
         const users = (await pool.query('SELECT * FROM users')).rows
 
-        // console.log('users ', users)
-
         users.forEach((user) => {
             delete user.password
             delete user.email
@@ -125,18 +120,11 @@ class AuthService {
         }
     }
 
-    // TODO: update for postgres
     async changePassword(oldPassword: string, newPassword: string, refreshToken: string) {
 
-        // console.log('refreshToken ', refreshToken)
-        // console.log('newPassword ', newPassword)
-        // console.log('oldPassword ', oldPassword)
-
         const userData = tokenService.validateRefreshToken(refreshToken)
-        // console.log('userData ', userData)
 
         const user = await pool.query('SELECT * FROM users WHERE email = $1', [userData.email])
-        // console.log('user ', user[0][0])
 
         const isPasswordEquals = await bcrypt.compare(oldPassword, user[0][0].password)
 

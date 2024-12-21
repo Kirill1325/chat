@@ -44,7 +44,7 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
                     <div className={cl.chatInfo}>
                         <p>{username}</p>
                         <p>{chatsLastMessages[chatId].message}</p>
-                        {/* <p>{chatsLastMessages[chatId].sender}</p> */}
+                        {/* <p>{chatsLastMessages[chatId].sender}</p> ONLY FOR GROUP CHATS */}
                     </div>
                 }
 
