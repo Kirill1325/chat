@@ -140,5 +140,17 @@ export const userApi = createApi({
                 },
             })
         }),
+
+        uploadPicture: builder.mutation<string, FormData>({
+            query: (body) => ({
+                url: 'auth/set-picture',
+                method: 'POST',
+                body,
+                headers: {
+                    // 'Content-Type': 'multipart/form-data',
+                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                },
+            })
+        }),
     }),
 })
