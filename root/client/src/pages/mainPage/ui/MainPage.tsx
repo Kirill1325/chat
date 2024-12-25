@@ -29,6 +29,7 @@ export const MainPage = () => {
     const { isSidebarOpen } = useAppSelector(state => state.sidebarSlice)
     const { isContactsModalOpen } = useAppSelector(state => state.contactsModalSlice)
     const { isSettingsModalOpen } = useAppSelector(state => state.settingsModalSlice)
+    const { searching } = useAppSelector(state => state.chatWindowHeaderSlice)
 
     const dispatch = useAppDispatch()
 
@@ -107,7 +108,8 @@ export const MainPage = () => {
     })
 
     const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !isSidebarOpen && !isContactsModalOpen && !isSettingsModalOpen) {
+        if (e.key === 'Escape' && !isSidebarOpen && !isContactsModalOpen && !isSettingsModalOpen && !searching) {
+            console.log('closing chat')
             dispatch(changeChatId(null))
         }
     }

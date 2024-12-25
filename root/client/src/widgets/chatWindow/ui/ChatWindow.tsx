@@ -15,9 +15,12 @@ export const ChatWindow = () => {
     const [message, setMessage] = useState('')
 
     const messagesRef = useRef<HTMLDivElement>(null)
+    const currentSearchedMessageRef = useRef<HTMLDivElement>(null)
+
+    const { currentSearchedMessageId } = useAppSelector(state => state.chatWindowHeaderSlice)
 
     useEffect(() => {
-        messagesRef.current && messagesRef.current.scrollTo({ top: messagesRef.current.scrollHeight, left: 0, behavior: 'smooth' })
+        messagesRef.current && messagesRef.current.scrollTo({ top: messagesRef.current.scrollHeight, left: 0 })
         // TODO: when delete and edit message at the top, it scrolls to bottom, fix
     }, [messages])
 
@@ -29,6 +32,10 @@ export const ChatWindow = () => {
         currentChatId && message === '' && socket.emit('get messages', currentChatId)
     }, [currentChatId])
 
+    useEffect(() => {
+        currentSearchedMessageRef.current && currentSearchedMessageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, [currentSearchedMessageId])
+
     const handleCancelEditing = () => {
         setMessage('')
         dispatch(setEditingMessage(null))
@@ -37,11 +44,19 @@ export const ChatWindow = () => {
     return (
         <div className={`${cl.chatWindow} ${currentChatId === null ? '' : cl.open}`}>
             {currentChatId &&
-                <div className={cl.messages} ref={messagesRef} >
-                    {messages && messages.map(message =>
-                        <MessageItem key={message.messageId} message={message} />
-                    )}
-                </div>
+                <>
+                   
+                    <div className={cl.messages} ref={messagesRef} >
+                        {messages && messages.map(msg =>
+                            <MessageItem
+                                key={msg.messageId}
+                                message={msg}
+                                currentSearchedMessageId={currentSearchedMessageId}
+                                ref={currentSearchedMessageRef}
+                            />
+                        )}
+                    </div>
+                </>
             }
 
             {editingMessageId &&

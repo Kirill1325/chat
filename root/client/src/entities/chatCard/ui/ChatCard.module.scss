@@ -34,9 +34,9 @@
 }
 
 .active {
-    background-color: rgb(43, 96, 149);
+    background-color: $active;
 
     &:hover {
-        background-color: rgb(43, 96, 149);
+        background-color: $active;
     }
 }

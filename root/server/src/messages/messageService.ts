@@ -87,6 +87,15 @@ class MessageService {
 
     }
 
+    async searchMessages(query: string, chatId: number): Promise<number[]> {
+        const result: number[] = (
+            await pool.query('SELECT message_id FROM messages WHERE payload LIKE $1 AND chat_id = $2', [`%${query}%`, chatId])
+        )
+            .rows.map(row => row.message_id).sort((a: number, b: number) => b - a)
+        console.log('messages ids', result)
+        return result
+    }
+
 }
 
 export const messageService = new MessageService()

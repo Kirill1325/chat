@@ -79,6 +79,12 @@ io.on('connection', (socket: Socket) => {
     socket.emit('get chats', chats)
   })
 
+  socket.on('search messages', async (query: string, chatId: number) => {
+    console.log('query', query)
+    const messagesIds = await messageService.searchMessages(query, chatId)
+    socket.emit('search messages', messagesIds)
+  })
+
   socket.on('disconnect', () => console.log('user disconnected'));
 
 })

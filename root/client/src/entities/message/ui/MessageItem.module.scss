@@ -1,49 +1,64 @@
 @import '../../../shared/vars.scss';
 
-.message {
+.messageWrapper {
+
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: fit-content;
-    padding: .4em .5em;
-    background-color: $secondary;
-    border-radius: 1vmax;
+    justify-content: center;
     margin-bottom: .6em;
-    max-width: 80%;
+    border-radius: 1vmax;
 
-
-    >* {
-        font-size: .9em;
-    }
-
-    >p {
-        width: 100%;
-        overflow-wrap: break-word;
-        text-align: start;
-        color: rgb(191, 81, 255);
-    }
-
-    >.messageContent {
+    .message {
         display: flex;
-        gap: .4em;
+        flex-direction: column;
+        align-items: center;
+        width: fit-content;
+        padding: .4em .5em;
+        background-color: $secondary;
+        border-radius: 1vmax;
+        margin-right: auto;
 
-        >b {
-            align-self: flex-end;
-            font-size: .7em;
-            color: rgb(170, 170, 170);
+        >* {
+            font-size: .9em;
+        }
+
+        >p {
+            width: 100%;
+            overflow-wrap: break-word;
+            text-align: start;
+            color: rgb(191, 81, 255);
+        }
+
+        >.messageContent {
+            display: flex;
+            gap: .4em;
+
+            >b {
+                align-self: flex-end;
+                font-size: .7em;
+                color: rgb(170, 170, 170);
+            }
+        }
+
+    }
+
+    .myMessage {
+        margin-left: auto;
+        margin-right: 0;
+
+        background-color: $active;
+
+        >p {
+            overflow-wrap: break-word;
+            width: 100%;
+            text-align: end;
         }
     }
 
 }
 
-.myMessage {
-    align-self: flex-end;
-
-    background-color: rgb(43, 96, 149);
-
-    >p {
-        overflow-wrap: break-word;
-        width: 100%;
-        text-align: end;
-    }
+.searchedMessage {
+    background-color: $search;
+    margin: -.2em -.5em .4em -.5em;
+    border-radius: 0;
+    padding: .2em .5em;
 }

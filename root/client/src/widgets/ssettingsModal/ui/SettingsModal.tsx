@@ -48,9 +48,9 @@ export const SettingsModal = () => {
     const [file, setFile] = useState<{picturePreview: string, pictureAsFile: File} | null>(null);
     const [uploadPicture] = userApi.useUploadPictureMutation()
 
-    useEffect(() => {
-        console.log(file)
-    }, [file])
+    // useEffect(() => {
+    //     console.log(file)
+    // }, [file])
 
     const setPic = (e: React.ChangeEvent<HTMLInputElement>) => {
        e.target.files && setFile({
