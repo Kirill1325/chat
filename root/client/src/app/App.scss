@@ -6,6 +6,7 @@
     box-sizing: border-box;
     font-family: sans-serif;
     color: white;
+
 }
 
 html {
@@ -15,7 +16,7 @@ html {
         height: 100%;
         background-color: $primary;
 
-        >#root{
+        >#root {
             height: 100%;
         }
     }

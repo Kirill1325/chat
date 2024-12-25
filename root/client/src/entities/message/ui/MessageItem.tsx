@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { convertDate } from '..'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { openContextMenu, setPosition, setSelectedMessage } from '../../../widgets/contextMenu/model/contextMenuSlice'
@@ -6,10 +7,11 @@ import { Message } from '../model/types'
 import cl from './MessageItem.module.scss'
 
 interface MessageItemProps {
-    message: Message
+    message: Message,
+    currentSearchedMessageId: number | null
 }
 
-export const MessageItem = ({ message }: MessageItemProps) => {
+export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ message, currentSearchedMessageId }, messageRef) => {
 
     const dispatch = useAppDispatch()
 
@@ -27,12 +29,19 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     }
 
     return (
-        <div className={`${cl.message} ${message.senderId === user.id ? cl.myMessage : ''}`} onContextMenu={(e) => handleRightClick(e)} >
-            {message.senderId !== user.id && <p>{username}</p>}
-            <div className={cl.messageContent}>
-                <p>{message.payload}</p>
-                <b>{convertDate(message)}</b>
+        <div className={`${cl.messageWrapper} ${currentSearchedMessageId === message.messageId ? cl.searchedMessage : ''}`}>
+            <div
+                className={` ${cl.message} ${message.senderId === user.id ? cl.myMessage : ''}`}
+                id={message.messageId.toString()}
+                onContextMenu={(e) => handleRightClick(e)}
+                ref={message.messageId === currentSearchedMessageId ? messageRef : null}
+            >
+                {message.senderId !== user.id && <p>{username}</p>}
+                <div className={cl.messageContent}>
+                    <p>{message.payload}</p>
+                    <b>{convertDate(message)}</b>
+                </div>
             </div>
         </div>
     )
-}   
+})   
