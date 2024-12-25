@@ -1,10 +1,13 @@
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import cl from './ChatWindow.module.scss'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { socket } from '../../../app/main'
 import { MessageItem } from '../../../entities/message/ui/MessageItem'
 import { setEditingMessage } from '../model/chatWindowSlice'
 import { MessageField } from '../../messageField'
+import { getDate } from '../../../entities/message/helpers/convertDate'
+
+const currentYear = (new Date().getFullYear()).toString()
 
 export const ChatWindow = () => {
 
@@ -45,15 +48,29 @@ export const ChatWindow = () => {
         <div className={`${cl.chatWindow} ${currentChatId === null ? '' : cl.open}`}>
             {currentChatId &&
                 <>
-                   
                     <div className={cl.messages} ref={messagesRef} >
-                        {messages && messages.map(msg =>
-                            <MessageItem
-                                key={msg.messageId}
-                                message={msg}
-                                currentSearchedMessageId={currentSearchedMessageId}
-                                ref={currentSearchedMessageRef}
-                            />
+                        {messages && messages.map((msg, idx) =>
+                            messages[idx - 1] && messages[idx] && getDate(messages[idx]) === getDate(messages[idx - 1]) ?
+                                <MessageItem
+                                    key={msg.messageId}
+                                    message={msg}
+                                    currentSearchedMessageId={currentSearchedMessageId}
+                                    ref={currentSearchedMessageRef}
+                                />
+                                :
+                                <React.Fragment key={msg.messageId} >
+                                    <div className={cl.date}>
+                                        {getDate(msg).slice(8) === currentYear
+                                            ? <p >{getDate(msg).slice(0, 7)}</p>
+                                            : <p >{getDate(msg)}</p>
+                                        }
+                                    </div>
+                                    <MessageItem
+                                        message={msg}
+                                        currentSearchedMessageId={currentSearchedMessageId}
+                                        ref={currentSearchedMessageRef}
+                                    />
+                                </React.Fragment>
                         )}
                     </div>
                 </>

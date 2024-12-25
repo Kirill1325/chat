@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import { convertDate } from '..'
+import { getTime } from '..'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { openContextMenu, setPosition, setSelectedMessage } from '../../../widgets/contextMenu/model/contextMenuSlice'
 import { userApi } from '../../user'
@@ -12,7 +12,7 @@ interface MessageItemProps {
 }
 
 export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ message, currentSearchedMessageId }, messageRef) => {
-
+  
     const dispatch = useAppDispatch()
 
     const { user } = useAppSelector(state => state.userSlice)
@@ -39,7 +39,7 @@ export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ messa
                 {message.senderId !== user.id && <p>{username}</p>}
                 <div className={cl.messageContent}>
                     <p>{message.payload}</p>
-                    <b>{convertDate(message)}</b>
+                    <b>{getTime(message)}</b>
                 </div>
             </div>
         </div>

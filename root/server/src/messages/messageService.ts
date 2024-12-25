@@ -91,6 +91,7 @@ class MessageService {
         const result: number[] = (
             await pool.query('SELECT message_id FROM messages WHERE payload LIKE $1 AND chat_id = $2', [`%${query}%`, chatId])
         )
+        // TODO: add order by instead of sort
             .rows.map(row => row.message_id).sort((a: number, b: number) => b - a)
         console.log('messages ids', result)
         return result

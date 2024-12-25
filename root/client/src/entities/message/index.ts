@@ -1,3 +1,3 @@
 export {type Message} from './model/types'
 
-export { convertDate} from './helpers/convertDate'
+export { getTime} from './helpers/convertDate'

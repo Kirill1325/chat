@@ -5,7 +5,7 @@ import { socket } from '../../../app/main'
 import { changeChatId } from '../../../widgets/chatWindow/model/chatWindowSlice'
 import { useEffect } from 'react'
 import { setLastMessage } from '../model/chatCardSlice'
-import { convertDate } from '../../message'
+import { getTime } from '../../message'
 
 interface ChatCardProps {
     chatId: number
@@ -50,7 +50,7 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
 
                 <div className={cl.chatTime}>
                     {/* <p>v</p> TODO: add read/sent logic */}
-                    <p>{convertDate(chatsLastMessages[chatId])}</p>
+                    <p>{getTime(chatsLastMessages[chatId])}</p>
                 </div>
 
             </div>

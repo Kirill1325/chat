@@ -16,6 +16,23 @@
         overflow-y: scroll;
         padding: .5em .5em 0 .5em;
 
+        >.date {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            >p {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: $secondary;
+                border-radius: 1vmax;
+                height: 120%;
+                padding: 0 .5em;
+                
+            }
+        }
+
     }
 
     >.messageEditInfo {
