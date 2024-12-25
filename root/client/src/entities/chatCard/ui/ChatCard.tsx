@@ -29,7 +29,7 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
 
     useEffect(() => {
         socket.emit('get last message', chatId)
-        socket.on('get last message', (message: { message: string, sender: string, chatId: number, createdAt: string }) => {
+        socket.on('get last message', (message: { message: string, sender: { id: number, username: string }, chatId: number, createdAt: string }) => {
             dispatch(setLastMessage(message))
         })
     }, [])
@@ -42,14 +42,19 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
 
                 {chatsLastMessages[chatId] &&
                     <div className={cl.chatInfo}>
-                        <p>{username}</p>
-                        <p>{chatsLastMessages[chatId].message}</p>
-                        {/* <p>{chatsLastMessages[chatId].sender}</p> ONLY FOR GROUP CHATS */}
+                        <div className={cl.chatInfoInner}>
+                            <p>{username}</p>
+                            <p>{chatsLastMessages[chatId].message}</p>
+                            {/* <p>{chatsLastMessages[chatId].sender.username}</p> ONLY FOR GROUP CHATS */}
+                        </div>
+                        {chatsLastMessages[chatId].sender.id && chatsLastMessages[chatId].sender.id !== user.id &&
+                            <svg className={cl.messageStatus} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 12.6111L8.92308 17.5L20 6.5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        }
                     </div>
                 }
-
                 <div className={cl.chatTime}>
-                    {/* <p>v</p> TODO: add read/sent logic */}
                     <p>{getTime(chatsLastMessages[chatId])}</p>
                 </div>
 

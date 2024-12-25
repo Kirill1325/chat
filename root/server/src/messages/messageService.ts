@@ -60,18 +60,21 @@ class MessageService {
 
     }
 
-    async getLastMessage(chatId: number): Promise<{ message: string, sender: string, chatId: number, createdAt: string }> {
+    async getLastMessage(chatId: number): Promise<{ message: string, sender: { id: number, username: string }, chatId: number, createdAt: string }> {
         const lastMessageId = (await pool.query('SELECT last_sent_message_id FROM chats WHERE chat_id = $1', [chatId]))
             .rows[0]
 
         if (lastMessageId && lastMessageId.last_sent_message_id !== null) {
             const lastMessage = await messageService.getMessageById(lastMessageId.last_sent_message_id)
 
-            const lastUser = (await pool.query('SELECT * FROM users WHERE id = $1', [lastMessage.senderId])).rows[0]
+            const lastUser = (await pool.query('SELECT id, username FROM users WHERE id = $1', [lastMessage.senderId])).rows[0]
 
             return {
                 message: lastMessage.payload,
-                sender: lastUser.username,
+                sender: {
+                    id: lastUser.id,
+                    username: lastUser.username
+                },
                 chatId: chatId,
                 createdAt: lastMessage.createdAt
             }
@@ -79,7 +82,10 @@ class MessageService {
         } else {
             return {
                 message: '',
-                sender: '',
+                sender: {
+                    id: null,
+                    username: ''
+                },
                 chatId: chatId,
                 createdAt: ''
             }

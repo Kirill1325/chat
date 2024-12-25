@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface chatCardState {
-    chatsLastMessages: Record<number, { message: string, sender: string, createdAt: string }>
+    chatsLastMessages: Record<number, { message: string, sender: { id: number, username: string }, createdAt: string }>
 }
 
 const initialState: chatCardState = {
@@ -12,10 +12,13 @@ export const chatCardSlice = createSlice({
     name: 'chatCard',
     initialState,
     reducers: {
-        setLastMessage: (state, action: PayloadAction<{ chatId: number, message: string, sender: string, createdAt: string }>) => {
+        setLastMessage: (state, action: PayloadAction<{ chatId: number, message: string, sender: { id: number, username: string }, createdAt: string }>) => {
             state.chatsLastMessages[action.payload.chatId] = {
                 message: action.payload.message,
-                sender: action.payload.sender,
+                sender: {
+                    id: action.payload.sender.id,
+                    username: action.payload.sender.username
+                },
                 createdAt: action.payload.createdAt
             }
         }

@@ -21,9 +21,23 @@
 
     >.chatInfo {
         display: flex;
-        flex-direction: column;
-        flex-basis: 70%;
+        justify-content: space-between;
+        flex-basis: 65%;
         padding-left: 1em;
+
+        >.chatInfoInner {
+            display: flex;
+            flex-direction: column;
+        }
+
+        >.messageStatus {
+            display: flex;
+            width: 1em;
+
+            >path {
+                stroke: rgb(0, 242, 255);
+            }
+        }
     }
 
     >.chatTime {

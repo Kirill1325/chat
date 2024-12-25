@@ -5,6 +5,7 @@
     height: 3em;
 
     >textarea {
+        
         resize: none;
         overflow: auto;
         background: $secondary;
@@ -12,7 +13,7 @@
         outline: none;
         width: 100%;
         height: 100%;
-        font-size: 1.3em;
+        font-size: 1em;
         padding: .5em 1.5em .5em 1em;
     }
 

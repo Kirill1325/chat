@@ -51,6 +51,7 @@ export const MessageField = ({ message, setMessage, handleCancelEditing }: Messa
       <textarea
         name='messageInput'
         id='messageInput'
+        placeholder='Type a message...'
         ref={inputRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
