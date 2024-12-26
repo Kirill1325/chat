@@ -34,8 +34,10 @@
             display: flex;
             width: 1em;
 
-            >path {
-                stroke: rgb(0, 242, 255);
+            >svg {
+                >path {
+                    stroke: rgb(0, 242, 255);
+                }
             }
         }
     }

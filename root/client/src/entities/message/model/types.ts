@@ -7,7 +7,7 @@ export type Message = {
     status: Status
 }
 
-enum Status {
+export enum Status {
     sending = 'sending',
     sent = 'sent',
     read = 'read'

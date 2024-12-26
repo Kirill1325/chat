@@ -1,10 +1,11 @@
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useMemo, useRef } from 'react'
 import { getTime } from '..'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { openContextMenu, setPosition, setSelectedMessage } from '../../../widgets/contextMenu/model/contextMenuSlice'
 import { userApi } from '../../user'
-import { Message } from '../model/types'
+import { Message, Status } from '../model/types'
 import cl from './MessageItem.module.scss'
+import { socket } from '../../../app/main'
 
 interface MessageItemProps {
     message: Message,
@@ -12,12 +13,24 @@ interface MessageItemProps {
 }
 
 export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ message, currentSearchedMessageId }, messageRef) => {
-  
+
     const dispatch = useAppDispatch()
 
     const { user } = useAppSelector(state => state.userSlice)
-
+    const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
     const { data: users } = userApi.useGetUsersQuery('') //TOOO: fetch only users that are in chat
+
+    const intersectionRef = useRef<HTMLDivElement>(null)
+
+    const observer = useMemo(() => new IntersectionObserver(([entry]) => {
+        message.senderId !== user.id && message.status === Status.sent && entry.isIntersecting &&
+            socket.emit('read message', message.messageId, currentChatId)
+    }), [intersectionRef])
+
+    useEffect(() => {
+        intersectionRef.current && observer.observe(intersectionRef.current)
+        return () => observer.disconnect()
+    }, [])
 
     const username = users && users.find(user => user.id === message.senderId)?.username
 
@@ -29,17 +42,23 @@ export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ messa
     }
 
     return (
-        <div className={`${cl.messageWrapper} ${currentSearchedMessageId === message.messageId ? cl.searchedMessage : ''}`}>
-            <div
-                className={` ${cl.message} ${message.senderId === user.id ? cl.myMessage : ''}`}
-                id={message.messageId.toString()}
-                onContextMenu={(e) => handleRightClick(e)}
-                ref={message.messageId === currentSearchedMessageId ? messageRef : null}
-            >
-                {message.senderId !== user.id && <p>{username}</p>}
-                <div className={cl.messageContent}>
-                    <p>{message.payload}</p>
-                    <b>{getTime(message)}</b>
+        <div
+            className={`${cl.messageWrapper} ${currentSearchedMessageId === message.messageId ? cl.searchedMessage : ''}`}
+            ref={intersectionRef}
+        >
+            <div className={`${cl.messageContainer} ${message.senderId === user.id ? cl.myMessage : ''}`}>
+                {message.senderId === user.id && message.status === Status.sent && <div className={cl.statusSent}></div>}
+                <div
+                    className={` ${cl.message} ${message.senderId === user.id ? cl.myMessage : ''}`}
+                    id={message.messageId.toString()}
+                    onContextMenu={(e) => handleRightClick(e)}
+                    ref={message.messageId === currentSearchedMessageId ? messageRef : null}
+                >
+                    {message.senderId !== user.id && <p>{username}</p>}
+                    <div className={cl.messageContent}>
+                        <p>{message.payload}</p>
+                        <b>{getTime(message)}</b>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,59 +1,80 @@
 @import '../../../shared/vars.scss';
 
 .messageWrapper {
-
     display: flex;
     justify-content: center;
+    align-items: center;
     margin-bottom: .6em;
     border-radius: 1vmax;
 
-    .message {
+    >.messageContainer {
+
         display: flex;
-        flex-direction: column;
         align-items: center;
-        width: fit-content;
-        padding: .4em .5em;
-        background-color: $secondary;
-        border-radius: 1vmax;
+        gap: .2em;
         margin-right: auto;
 
-        >* {
-            font-size: .9em;
-        }
-
-        >p {
-            width: 100%;
-            overflow-wrap: break-word;
-            text-align: start;
-            color: rgb(191, 81, 255);
-        }
-
-        >.messageContent {
+        >.statusSent {
+            width: .5em;
+            height: .5em;
+            border-radius: 50%;
+            background-color: $active;
             display: flex;
-            gap: .4em;
+            justify-content: center;
+            align-items: center;
+            color: $secondary;
+        }
 
-            >b {
-                align-self: flex-end;
-                font-size: .7em;
-                color: rgb(170, 170, 170);
+        .message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: fit-content;
+            padding: .4em .5em;
+            background-color: $secondary;
+            border-radius: 1vmax;
+            margin-right: auto;
+
+            >* {
+                font-size: .9em;
+            }
+
+            >p {
+                width: 100%;
+                overflow-wrap: break-word;
+                text-align: start;
+                color: rgb(191, 81, 255);
+            }
+
+            >.messageContent {
+                display: flex;
+                gap: .4em;
+
+                >b {
+                    align-self: flex-end;
+                    font-size: .7em;
+                    color: rgb(170, 170, 170);
+                }
+            }
+
+        }
+
+        .myMessage {
+            background-color: $active;
+
+            >p {
+                overflow-wrap: break-word;
+                width: 100%;
+                text-align: end;
             }
         }
-
     }
 
     .myMessage {
         margin-left: auto;
         margin-right: 0;
 
-        background-color: $active;
-
-        >p {
-            overflow-wrap: break-word;
-            width: 100%;
-            text-align: end;
-        }
     }
-
 }
 
 .searchedMessage {

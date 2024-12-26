@@ -1,6 +1,6 @@
 import { pool } from "../config/dbConfig"
 import { MessageDto } from "./messageDto";
-import { Message } from "./types";
+import { Message, Status } from "./types";
 
 class MessageService {
 
@@ -60,35 +60,31 @@ class MessageService {
 
     }
 
-    async getLastMessage(chatId: number): Promise<{ message: string, sender: { id: number, username: string }, chatId: number, createdAt: string }> {
+    async getLastMessage(chatId: number): Promise<MessageDto> {
         const lastMessageId = (await pool.query('SELECT last_sent_message_id FROM chats WHERE chat_id = $1', [chatId]))
             .rows[0]
 
         if (lastMessageId && lastMessageId.last_sent_message_id !== null) {
             const lastMessage = await messageService.getMessageById(lastMessageId.last_sent_message_id)
 
-            const lastUser = (await pool.query('SELECT id, username FROM users WHERE id = $1', [lastMessage.senderId])).rows[0]
-
-            return {
-                message: lastMessage.payload,
-                sender: {
-                    id: lastUser.id,
-                    username: lastUser.username
-                },
-                chatId: chatId,
-                createdAt: lastMessage.createdAt
-            }
+            return new MessageDto({
+                message_id: lastMessage.messageId,
+                sender_id: lastMessage.senderId,
+                chat_id: lastMessage.chatId,
+                payload: lastMessage.payload,
+                created_at: lastMessage.createdAt,
+                status: lastMessage.status
+            })
 
         } else {
-            return {
-                message: '',
-                sender: {
-                    id: null,
-                    username: ''
-                },
-                chatId: chatId,
-                createdAt: ''
-            }
+            return new MessageDto({
+                message_id: null,
+                sender_id: null,
+                chat_id: null,
+                payload: '',
+                created_at: '',
+                status: null
+            })
         }
 
     }
@@ -97,10 +93,15 @@ class MessageService {
         const result: number[] = (
             await pool.query('SELECT message_id FROM messages WHERE payload LIKE $1 AND chat_id = $2', [`%${query}%`, chatId])
         )
-        // TODO: add order by instead of sort
+            // TODO: add order by instead of sort
             .rows.map(row => row.message_id).sort((a: number, b: number) => b - a)
-        console.log('messages ids', result)
         return result
+    }
+
+    async readMessage(messageId: number) {
+        const result = (await pool.query('UPDATE messages SET status = $1 WHERE message_id = $2 RETURNING *', ['read', messageId])).rows[0]
+        const message = new MessageDto(result)
+        return message
     }
 
 }

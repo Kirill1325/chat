@@ -44,8 +44,6 @@ io.on('connection', (socket: Socket) => {
   socket.on('send message', async (userId: number, chatId: number, payload: string, createdAt: string) => {
     const sentMessage = await messageService.sendMessage(userId, chatId, payload, createdAt)
     const recievedMessage = await messageService.getMessageById(sentMessage.messageId)
-    //TODO: remove getMessageById completely if it's not used anywhere else
-    // make messageService.sendMessage return full message
     io.sockets.in(chatId.toString()).emit('send message', recievedMessage)
   })
 
@@ -69,6 +67,11 @@ io.on('connection', (socket: Socket) => {
     io.sockets.emit('get last message', lastMessage)
   })
 
+  socket.on('read message', async (messageId: number, chatId: number) => {
+    const message = await messageService.readMessage(messageId)
+    io.sockets.in(chatId.toString()).emit('read message', message)
+   })
+
   socket.on('connect to dm', async (senderId: number, recipientId: number) => {
     const chat = await chatsService.connectToDm(senderId, recipientId)
     io.sockets.emit('connect to dm', chat)
@@ -80,10 +83,11 @@ io.on('connection', (socket: Socket) => {
   })
 
   socket.on('search messages', async (query: string, chatId: number) => {
-    console.log('query', query)
     const messagesIds = await messageService.searchMessages(query, chatId)
-    socket.emit('search messages', messagesIds)
+    io.sockets.in(chatId.toString()).emit('search messages', messagesIds)
   })
+
+  
 
   socket.on('disconnect', () => console.log('user disconnected'));
 

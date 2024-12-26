@@ -14,7 +14,9 @@ import { ChatsListHeader } from "../../../widgets/chatsListHeader"
 import { ChatWindowHeader } from "../../../widgets/chatWindowHeader"
 import { socket } from "../../../app/main"
 import { setChats } from "../../../widgets/chatsList/model/chatsListSlice"
-import { changeChatId, setMessages, editMessage, deleteMessage } from "../../../widgets/chatWindow/model/chatWindowSlice"
+import { changeChatId, setMessages, editMessage, deleteMessage, changeMessageStatus } from "../../../widgets/chatWindow/model/chatWindowSlice"
+import { Message } from "../../../entities/message"
+import { changeStatus, setLastMessage } from "../../../entities/chatCard/model/chatCardSlice"
 
 export const MainPage = () => {
 
@@ -104,6 +106,27 @@ export const MainPage = () => {
         })
         return () => {
             socket.off('delete message')
+        }
+    })
+
+    useEffect(() => {
+        socket.on('get last message', (message: Message) => {
+            dispatch(setLastMessage(message))
+        })
+
+        return () => {
+            socket.off('get last message')
+        }
+    })
+
+    useEffect(() => {
+        socket.on('read message', (message: Message) => {
+            dispatch(changeMessageStatus({ messageId: message.messageId }))
+            dispatch(changeStatus(message))
+        })
+
+        return () => {
+            socket.off('read message')
         }
     })
 
