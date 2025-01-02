@@ -1,3 +1,8 @@
+export enum UserStatus {
+    online = 'Online',
+    offline = 'Offline'
+}
+
 export type User = {
     id: number
     username: string
@@ -5,7 +10,7 @@ export type User = {
     password: string
 }
 
-export type UserDto = Omit<User, 'password'>
+export type UserDto = Omit<User, 'password'> & { status: UserStatus }
 
 export type UpdatePasswordRequest = {
     oldPassword: string

@@ -75,16 +75,6 @@ export class AuthController {
         }
     }
 
-    async getUsers(req: Request, res: Response) {
-        try {
-            const query = req.query.query as string
-            const users = await authService.getUsers(query)
-            return res.json(users)
-        } catch (e) {
-            res.json(e)
-        }
-    }
-
     async changePassword(req: Request, res: Response, next: NextFunction) {
 
         // TODO: add mail letter that updates password
@@ -96,18 +86,6 @@ export class AuthController {
             const user = await authService.changePassword(oldPassword, newPassword, refreshToken)
 
             return res.json(user)
-        } catch (e) {
-            next(e)
-        }
-    }
-
-    async uploadPicture(req: Request, res: Response, next: NextFunction) {
-        try {
-            const avatar = req.file
-
-            console.log(avatar)
-
-            res.sendStatus(200);
         } catch (e) {
             next(e)
         }

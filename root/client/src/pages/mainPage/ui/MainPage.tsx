@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../../app/store"
-import { setUser } from "../../../entities/user/model/userSlice"
+import { setUser, setUsers, updateUserStatus } from "../../../entities/user/model/userSlice"
 import { ChatsList } from "../../../widgets/chatsList"
 import { ChatWindow } from "../../../widgets/chatWindow"
 import { Sidebar } from "../../../widgets/sidebar"
@@ -17,6 +17,7 @@ import { setChats } from "../../../widgets/chatsList/model/chatsListSlice"
 import { changeChatId, setMessages, editMessage, deleteMessage, changeMessageStatus } from "../../../widgets/chatWindow/model/chatWindowSlice"
 import { Message } from "../../../entities/message"
 import { changeStatus, setLastMessage } from "../../../entities/chatCard/model/chatCardSlice"
+import { UserStatus } from "../../../entities/user/model/types"
 
 export const MainPage = () => {
 
@@ -40,12 +41,62 @@ export const MainPage = () => {
         if (isLogged) {
             refresh().unwrap().then(userFetced => {
                 dispatch(setUser(userFetced.user))
+                socket.auth = { id: userFetced.user.id }
+                socket.connect()
             })
         } else {
-            navigate('/registration')
+            navigate('/login')
         }
 
     }, [])
+
+    useEffect(() => {
+        socket.on('user disconnected', (userId: number) => {
+            console.log('user disconnected', userId)
+            dispatch(updateUserStatus({ id: userId, status: UserStatus.offline }))
+        })
+
+        return () => {
+            socket.off('user disconnected')
+        }
+    })
+
+    useEffect(() => {
+        socket.on('user connected', (userId: number) => {
+            console.log('user connected', userId)
+            dispatch(updateUserStatus({ id: userId, status: UserStatus.online }))
+        })
+
+        return () => {
+            socket.off('user connected')
+        }
+    })
+
+    useEffect(() => {
+        socket.emit('get users')
+    }, [])
+
+    useEffect(() => {
+        socket.on('get users', (users: UserDto[]) => {
+            console.log(users)
+            dispatch(setUsers(users))
+        })
+
+        return () => {
+            socket.off('get users')
+        }
+    })
+
+    useEffect(() => {
+        socket.on('connect', () => {
+            console.log('WebSocket connected')
+            // socket.emit('go online', user.id)
+        });
+
+        return () => {
+            socket.off('connect')
+        }
+    })
 
     useEffect(() => {
         socket.on('connect to dm', (chat: { chatId: number, members: UserDto[] }) => {
@@ -131,8 +182,7 @@ export const MainPage = () => {
     })
 
     const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !isSidebarOpen && !isContactsModalOpen && !isSettingsModalOpen && !searching) {
-            console.log('closing chat')
+        if (e.key === 'Escape' && !isSidebarOpen && !isContactsModalOpen && !isSettingsModalOpen && !searching && currentChatId) {
             dispatch(changeChatId(null))
         }
     }

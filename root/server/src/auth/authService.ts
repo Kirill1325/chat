@@ -1,8 +1,9 @@
 import { pool } from "../config/dbConfig";
 import bcrypt from 'bcrypt'
 import { ApiError } from "../exceptions/apiError";
-import { UserDto } from "./userDto";
+import { UserDto } from "../user/userDto";
 import { tokenService } from "../token/tokenService";
+import { UserStatus } from "../user/types";
 
 interface User {
     id: number
@@ -101,25 +102,6 @@ class AuthService {
         }
     }
 
-    async getUsers(searchQuery: string): Promise<User[]> {
-
-        const users = (await pool.query('SELECT * FROM users')).rows
-
-        users.forEach((user) => {
-            delete user.password
-            delete user.email
-            delete user.status
-            delete user.role
-        })
-
-        if (searchQuery !== undefined) {
-            return (searchQuery.length > 0
-                ? users.filter(user => user.username.toLowerCase().match(searchQuery.toLowerCase())) as User[]
-                : users as User[]
-            )
-        }
-    }
-
     async changePassword(oldPassword: string, newPassword: string, refreshToken: string) {
 
         const userData = tokenService.validateRefreshToken(refreshToken)
@@ -153,10 +135,6 @@ class AuthService {
             ...tokens,
             user: { ...userDto }
         }
-    }
-
-    async uploadPicture() {
-
     }
 
 }

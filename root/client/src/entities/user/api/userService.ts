@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { User, Response } from '..'
-import { UpdatePasswordRequest, UserDto } from '../model/types'
+import { UpdatePasswordRequest } from '../model/types'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
@@ -12,17 +12,6 @@ export const userApi = createApi({
     baseQuery,
 
     endpoints: (builder) => ({
-
-        getUsers: builder.query<Omit<UserDto, 'email'>[], string>({
-            query: (searchQuery) => ({
-                url: `auth/users?query=${searchQuery}`,
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                },
-            }),
-        }),
 
         registration: builder.mutation<Response, Partial<User>>({
             query: (user) => ({
@@ -75,53 +64,6 @@ export const userApi = createApi({
                 url: 'auth/change-password',
                 method: 'POST',
                 body,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                },
-            })
-        }),
-
-        // createChat: builder.mutation<{ chat_id: number }, { creatorId: number, type: ChatTypes }>({
-        //     query: ({ creatorId, type }) => ({
-        //         url: 'chats/create',
-        //         method: 'POST',
-        //         body: { creatorId, type },
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-        //         },
-        //     })
-
-        // }),
-
-        connectToChat: builder.mutation<void, { chatId: number, userId: number }>({
-            query: ({ chatId, userId }) => ({
-                url: 'chats/connect',
-                method: 'POST',
-                body: { chatId, userId },
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                },
-            })
-        }),
-
-        getLastMessage: builder.query<string, number>({
-            query: (chatId) => ({
-                url: `chats/last-message/${chatId}`,
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                },
-            })
-        }),
-
-        getLastUser: builder.query<string, number>({
-            query: (chatId) => ({
-                url: `chats/last-user/${chatId}`,
-                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,

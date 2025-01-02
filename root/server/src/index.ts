@@ -1,17 +1,19 @@
 import 'dotenv/config'
 import express from 'express';
 import http from 'http';
-import { configure } from './config/appConfig';
+import { configureServer, configureSocketServer } from './config/appConfig';
 import { createTables } from './config/dbConfig';
 import { Server, Socket } from "socket.io";
 import { messageService } from './messages/messageService';
 import chatsService, { ChatTypes } from './chats/chatsService';
+import { authService } from './auth/authService';
+import { UserStatus } from './user/types';
+import { UserDto } from './user/userDto';
+import { userService } from './user/userService';
 
 const PORT = process.env.PORT || 3000
 
 const app = express()
-
-configure(app)
 
 createTables()
 
@@ -27,10 +29,22 @@ const io = new Server(server, {
   }
 });
 
+configureServer(app)
+configureSocketServer(io)
+
 // TODO: add reconnect
+// TODO: remove SELECT *, RETURNING * from all queries
 io.on('connection', (socket: Socket) => {
 
-  console.log('a user connected');
+  console.log('a user connected', socket.data.id);
+
+  io.sockets.emit('user connected', socket.data.id);
+
+  const changeStatusToOnline = async () => {
+    console.log('users ids', socket.data.id)
+    await userService.changeStatusToOnline(socket.data.id)
+  }
+  changeStatusToOnline()
 
   socket.on('join room', async (chatId: string, userId: number) => {
     await socket.join(chatId);
@@ -40,6 +54,16 @@ io.on('connection', (socket: Socket) => {
     await socket.leave(chatId);
     console.log(`user ${userId} left room ${chatId}`)
   });
+
+  socket.on('get users', async () => {
+    const users = await userService.getUsers()
+    socket.emit('get users', users)
+  })
+
+  socket.on('search contacts', async (searchQuery: string) => {
+    const users = await userService.getUsers(searchQuery)
+    socket.emit('search contacts', users)
+  })
 
   socket.on('send message', async (userId: number, chatId: number, payload: string, createdAt: string) => {
     const sentMessage = await messageService.sendMessage(userId, chatId, payload, createdAt)
@@ -70,7 +94,7 @@ io.on('connection', (socket: Socket) => {
   socket.on('read message', async (messageId: number, chatId: number) => {
     const message = await messageService.readMessage(messageId)
     io.sockets.in(chatId.toString()).emit('read message', message)
-   })
+  })
 
   socket.on('connect to dm', async (senderId: number, recipientId: number) => {
     const chat = await chatsService.connectToDm(senderId, recipientId)
@@ -87,8 +111,10 @@ io.on('connection', (socket: Socket) => {
     io.sockets.in(chatId.toString()).emit('search messages', messagesIds)
   })
 
-  
-
-  socket.on('disconnect', () => console.log('user disconnected'));
+  socket.on('disconnect', async () => {
+    console.log('user disconnected', socket.data.id)
+    await userService.changeStatusToOffline(socket.data.id)
+    io.sockets.emit('user disconnected', socket.data.id)
+  });
 
 })

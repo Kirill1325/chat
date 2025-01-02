@@ -8,6 +8,7 @@ import { useClickOutside } from '../../../shared/useOutsideClick'
 import profilePic from '../../../assets/logo.png'
 import { openContactsModal } from '../../contactsModal/model/contactsModalSlice'
 import { useEffect } from 'react'
+import { socket } from '../../../app/main'
 
 export const Sidebar = () => {
 
@@ -23,7 +24,8 @@ export const Sidebar = () => {
   const handleLogout = () => {
     logout()
     localStorage.removeItem('token')
-    navigate('/registration')
+    navigate('/login')
+    socket.disconnect()
   }
 
   const handleSidebarClose = () => {

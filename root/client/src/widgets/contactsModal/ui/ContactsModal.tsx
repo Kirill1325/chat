@@ -1,17 +1,18 @@
-import { userApi } from '../../../entities/user'
+import { useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { closeContactsModal } from '../model/contactsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
 import cl from './ContactsModal.module.scss'
 import { socket } from '../../../app/main'
-import { useEffect, useRef, useState } from 'react'
 import pic from '../../../assets/logo.png'
+import { UserDto, UserStatus } from '../../../entities/user/model/types'
 
 export const ContactsModal = () => {
 
     const [searchQuery, setSearchQuery] = useState('')
+    const [contacts, setContacts] = useState<UserDto[]>([])
 
-    const { data: users } = userApi.useGetUsersQuery(searchQuery)
+    // const { users } = useAppSelector(state => state.userSlice)
 
     const dispatch = useAppDispatch()
     const { isContactsModalOpen } = useAppSelector(state => state.contactsModalSlice)
@@ -31,7 +32,7 @@ export const ContactsModal = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const timer = setTimeout(() => {
             setSearchQuery(e.target.value)
-        }, 1000);
+        }, 500);
         return () => clearTimeout(timer);
     }
 
@@ -57,6 +58,20 @@ export const ContactsModal = () => {
     useEffect(() => {
         inputRef.current && inputRef.current.focus()
     }, [isContactsModalOpen])
+
+    useEffect(() => {
+        socket.emit('search contacts', searchQuery)
+    }, [searchQuery])
+
+    useEffect(() => {
+        socket.on('search contacts', (contacts: UserDto[]) => {
+            setContacts(contacts)
+        })
+
+        return () => {
+            socket.off('search contacts')
+        }
+    })
 
     return (
         <div className={`${cl.contactsModal} ${isContactsModalOpen ? cl.open : ''}`} >
@@ -88,13 +103,13 @@ export const ContactsModal = () => {
                     </label>
                 </div>
                 <div className={cl.contacts}>
-                    {users && users.map(u =>
-                        u.id !== user.id &&
-                        <div className={cl.contact} key={u.id} onClick={() => connectToDm(u.id)}>
+                    {contacts && contacts.map(contact =>
+                        contact.id !== user.id &&
+                        <div className={cl.contact} key={contact.id} onClick={() => connectToDm(contact.id)}>
                             <img src={pic} alt='pic' />
                             <div className={cl.user}>
-                                <p className={cl.username}>{u.username}</p>
-                                <p className={cl.online}>online</p>
+                                <p className={cl.username}>{contact.username}</p>
+                                <p className={`${contact.status === UserStatus.online ? cl.online : ''}`}>{contact.status}</p>
                             </div>
                         </div>
                     )}

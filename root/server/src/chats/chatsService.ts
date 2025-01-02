@@ -1,5 +1,5 @@
 import { pool } from "../config/dbConfig"
-import { UserDto } from "../auth/userDto"
+import { UserDto } from "../user/userDto"
 import { Message } from "../messages/types"
 import { Chat, ChatMember } from "./types"
 
