@@ -5,6 +5,7 @@ import logo from '../../../assets/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { socket } from '../../../app/main'
 import { setCurrentSearchedMessageId, setSearchedMessages, setSearching } from '../model/chatWindowHeaderSlice'
+import { UserStatus } from '../../../entities/user/model/types'
 
 export const ChatWindowHeader = () => {
 
@@ -19,9 +20,8 @@ export const ChatWindowHeader = () => {
     const { searchedMessages, searching, currentSearchedMessageId } = useAppSelector(state => state.chatWindowHeaderSlice)
 
     const chat = chats.find(c => c.chatId === currentChatId)
-    const username = chat?.members.find(m => m.id !== user.id)?.username
+    const member = chat?.members.find(m => m.id !== user.id)
 
-    // const headerRef = useClickOutside(() => closeSearch())
     const inputRef = useRef<HTMLInputElement>(null)
 
     const handleNextMessage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -79,7 +79,7 @@ export const ChatWindowHeader = () => {
     }, [searching])
 
     return (
-        <div className={cl.chatWindowHeader} >
+        <header className={cl.chatWindowHeader} >
             {currentSearchedMessageId && searching &&
                 <div className={cl.navButtons}>
                     <button
@@ -133,7 +133,12 @@ export const ChatWindowHeader = () => {
                 <>
                     <div className={cl.user}>
                         <img src={logo} alt='pic' />
-                        <p>{username}</p>
+                        {member &&
+                            <div className={cl.usernameWithStatus}>
+                                <p className={cl.username}>{member.username}</p>
+                                <p className={`${member.status === UserStatus.online ? cl.online : cl.offline}`}>{member.status}</p>
+                            </div>
+                        }
                     </div>
                     <div className={cl.searchButton}>
                         <button onClick={() => dispatch(setSearching(true))}>
@@ -144,6 +149,6 @@ export const ChatWindowHeader = () => {
                     </div>
                 </>
             }
-        </div>
+        </header>
     )
 }

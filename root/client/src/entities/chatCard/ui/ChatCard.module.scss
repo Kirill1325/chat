@@ -12,6 +12,11 @@
         background-color: $hover;
     }
 
+    &:focus {
+        background-color: $hover;
+        outline: none;
+    }
+
     >img {
         width: 50px;
         height: auto;

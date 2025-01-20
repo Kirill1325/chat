@@ -52,7 +52,6 @@ export const MainPage = () => {
 
     useEffect(() => {
         socket.on('user disconnected', (userId: number) => {
-            console.log('user disconnected', userId)
             dispatch(updateUserStatus({ id: userId, status: UserStatus.offline }))
         })
 
@@ -63,7 +62,6 @@ export const MainPage = () => {
 
     useEffect(() => {
         socket.on('user connected', (userId: number) => {
-            console.log('user connected', userId)
             dispatch(updateUserStatus({ id: userId, status: UserStatus.online }))
         })
 
@@ -78,7 +76,6 @@ export const MainPage = () => {
 
     useEffect(() => {
         socket.on('get users', (users: UserDto[]) => {
-            console.log(users)
             dispatch(setUsers(users))
         })
 
@@ -201,18 +198,18 @@ export const MainPage = () => {
             <SettingsModal />
             <ContactsModal />
             <ContextMenu />
-            <div className={`${cl.chatsList} ${currentChatId ? '' : cl.open}`}>
+            <aside className={`${cl.chatsList} ${currentChatId ? '' : cl.open}`}>
                 <ChatsListHeader />
                 <ChatsList />
-            </div>
+            </aside>
             {currentChatId
-                ? <div className={`${cl.chatWindow} ${currentChatId ? cl.open : ''}`}>
+                ? <main className={`${cl.chatWindow} ${currentChatId ? cl.open : ''}`}>
                     <ChatWindowHeader />
                     <ChatWindow />
-                </div>
-                : <div className={cl.selectChatTab}>
+                </main>
+                : <main className={cl.selectChatTab}>
                     <div>Select a chat</div>
-                </div>
+                </main>
             }
         </div>
 

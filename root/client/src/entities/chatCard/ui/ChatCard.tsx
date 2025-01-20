@@ -32,7 +32,11 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
 
     return (
         chatsLastMessages[chatId] !== undefined && (
-            <div className={`${cl.chatCard} ${currentChatId === chatId ? cl.active : ''}`} onClick={handleChatChange} >
+            <div
+                className={`${cl.chatCard} ${currentChatId === chatId ? cl.active : ''}`}
+                tabIndex={0}
+                onClick={handleChatChange}
+            >
 
                 <img src={logo} alt='pic' />
 

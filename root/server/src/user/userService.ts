@@ -12,7 +12,7 @@ class UserService {
                 : users
             )
         }
-    } //TODO: remove from auth
+    } 
 
     async changeStatusToOnline(id: number[]) {
         await pool.query('UPDATE users SET status = $1 WHERE id = $2', [UserStatus.online, id])

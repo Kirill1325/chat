@@ -62,7 +62,7 @@ class chatsService {
         const query = `
             SELECT 
                 cm.chat_id,
-                json_agg(json_build_object('email', u.email, 'username', u.username, 'id', u.id)) AS members
+                json_agg(json_build_object('email', u.email, 'username', u.username, 'id', u.id, 'status', u.status)) AS members
             FROM 
                 chat_members cm
             JOIN 
@@ -79,14 +79,10 @@ class chatsService {
 
         const result: { chat_id: number, members: any[] }[] = (await pool.query(query, [userId])).rows
 
-        // console.log('result', result)
-
         const chats = result.map(row => ({
             chatId: row.chat_id,
             members: row.members.map((member: any) => new UserDto(member)),
         }))
-
-        // console.log('chats', chats)
 
         return chats
     }

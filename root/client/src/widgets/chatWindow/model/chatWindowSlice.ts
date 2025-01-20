@@ -1,4 +1,4 @@
-import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Message, Status } from "../../../entities/message";
 
 interface chatWindowState {
@@ -31,7 +31,6 @@ export const chatWindowSlice = createSlice({
         },
         setEditingMessage: (state, action: PayloadAction<number | null>) => {
             state.editingMessageId = action.payload
-            console.log(current(state))
         },
         changeMessageStatus: (state, action: PayloadAction<{ messageId: number }>) => {
             state.messages = state.messages.map(message => message.messageId === action.payload.messageId

@@ -58,7 +58,7 @@ export const Sidebar = () => {
   const ref = useClickOutside(handleSidebarClose)
 
   return (
-    <div className={`${cl.sidebar} ${isSidebarOpen ? cl.open : ''}`}>
+    <aside className={`${cl.sidebar} ${isSidebarOpen ? cl.open : ''}`}>
       <div className={cl.sidebarContent} ref={ref}>
         <div className={cl.sidebarUserInfo}>
           <img src={profilePic} alt="profile pic" />
@@ -75,6 +75,6 @@ export const Sidebar = () => {
           <button onClick={() => { }}>night mode</button>
         </div>
       </div>
-    </div>
+    </aside>
   )
 }

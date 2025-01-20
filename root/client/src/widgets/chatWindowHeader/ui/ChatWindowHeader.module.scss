@@ -19,7 +19,7 @@
         top: 87vh;
         right: 2%;
         transform: translate(-50%, -50%);
-    
+
         >button {
             display: flex;
             justify-content: center;
@@ -31,21 +31,21 @@
             outline: none;
             background: $secondary;
             cursor: pointer;
-    
+
             &[disabled] {
                 cursor: default;
                 background: transparent;
                 border: 1px solid black;
-    
+
                 &:hover {
                     background: transparent;
                 }
             }
-    
+
             &:hover {
                 background-color: $primary;
             }
-    
+
         }
     }
 
@@ -76,6 +76,23 @@
             height: 2em;
             border-radius: 50%;
         }
+
+        >.usernameWithStatus {
+            display: flex;
+            flex-direction: column;  
+
+            >p:last-child {
+                font-size: .8em;
+            }
+
+            >.online {
+                color: rgb(46, 99, 198);
+            }
+
+            >.offline {
+                color: lightgray;
+            }
+        }
     }
 
     >.backButton {
@@ -85,14 +102,14 @@
 
     }
 
-    >.messageSearchContainer{
+    >.messageSearchContainer {
         display: flex;
         justify-content: center;
         align-items: center;
         width: 100%;
         height: 80%;
 
-        >input{
+        >input {
             width: 100%;
             height: 100%;
             border-radius: 5px;
@@ -105,7 +122,7 @@
             caret-color: white;
         }
 
-        >.closeSearch{
+        >.closeSearch {
             width: 2em;
             height: 2em;
             background: transparent;

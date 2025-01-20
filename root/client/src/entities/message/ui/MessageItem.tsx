@@ -2,7 +2,6 @@ import { forwardRef, useEffect, useMemo, useRef } from 'react'
 import { getTime } from '..'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { openContextMenu, setPosition, setSelectedMessage } from '../../../widgets/contextMenu/model/contextMenuSlice'
-import { userApi } from '../../user'
 import { Message, Status } from '../model/types'
 import cl from './MessageItem.module.scss'
 import { socket } from '../../../app/main'
@@ -18,7 +17,7 @@ export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ messa
 
     const { user } = useAppSelector(state => state.userSlice)
     const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
-    const { data: users } = userApi.useGetUsersQuery('') //TOOO: fetch only users that are in chat
+    const { users } = useAppSelector(state => state.userSlice)
 
     const intersectionRef = useRef<HTMLDivElement>(null)
 
