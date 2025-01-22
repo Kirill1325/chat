@@ -34,7 +34,8 @@ export const createTables = async () => {
     email VARCHAR(255) UNIQUE,
     password VARCHAR(255),
     status user_status,
-    role user_roles
+    role user_roles,
+    profile_pic_id integer references profile_pics(id)
   );`
 
   await pool
@@ -130,5 +131,24 @@ export const createTables = async () => {
       console.log(err);
 
     });
+
+    const profilePicsTable = `CREATE TABLE IF NOT EXISTS profile_pics (
+      id SERIAL PRIMARY KEY,
+      filename VARCHAR(255) UNIQUE NOT NULL,
+      filepath VARCHAR(255) NOT NULL,
+      mimetype VARCHAR(255) NOT NULL,
+      size BIGINT NOT NULL,
+      user_id integer references users(id)
+    );`
+  
+    await pool
+      .query(profilePicsTable)
+      .then((res: any) => {
+        console.log(res);
+      })
+      .catch((err: any) => {
+        console.log(err);
+  
+      });
 
 }; 

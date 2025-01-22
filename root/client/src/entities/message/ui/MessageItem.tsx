@@ -17,7 +17,7 @@ export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ messa
 
     const { user } = useAppSelector(state => state.userSlice)
     const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
-    const { users } = useAppSelector(state => state.userSlice)
+    // const { users } = useAppSelector(state => state.userSlice)
 
     const intersectionRef = useRef<HTMLDivElement>(null)
 
@@ -31,8 +31,8 @@ export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ messa
         return () => observer.disconnect()
     }, [])
 
-    const username = users && users.find(user => user.id === message.senderId)?.username
-
+    // const username = users && users.find(user => user.id === message.senderId)?.username
+    
     const handleRightClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault()
         dispatch(setPosition({ x: e.clientX, y: e.clientY }))
@@ -53,7 +53,7 @@ export const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ messa
                     onContextMenu={(e) => handleRightClick(e)}
                     ref={message.messageId === currentSearchedMessageId ? messageRef : null}
                 >
-                    {message.senderId !== user.id && <p>{username}</p>}
+                    {/* {message.senderId !== user.id && <p>{username}</p>} */}
                     <div className={cl.messageContent}>
                         <p>{message.payload}</p>
                         <b>{getTime(message)}</b>

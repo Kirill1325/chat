@@ -9,6 +9,7 @@ import profilePic from '../../../assets/logo.png'
 import { openContactsModal } from '../../contactsModal/model/contactsModalSlice'
 import { useEffect } from 'react'
 import { socket } from '../../../app/main'
+import { openFilePreviewModal } from '../../filePreview/model/filePreviewSlice'
 
 export const Sidebar = () => {
 
@@ -61,7 +62,7 @@ export const Sidebar = () => {
     <aside className={`${cl.sidebar} ${isSidebarOpen ? cl.open : ''}`}>
       <div className={cl.sidebarContent} ref={ref}>
         <div className={cl.sidebarUserInfo}>
-          <img src={profilePic} alt="profile pic" />
+          <img src={user.profilePic} alt="profile pic" />
           <p>{user.username}</p>
         </div>
         <div className={cl.sidebarButtons}>
@@ -73,6 +74,7 @@ export const Sidebar = () => {
           <button onClick={handleSettingsModalOpen}>settings</button>
           <button onClick={handleLogout}>logout</button>
           <button onClick={() => { }}>night mode</button>
+          <button onClick={() => dispatch(openFilePreviewModal())}>file</button>
         </div>
       </div>
     </aside>

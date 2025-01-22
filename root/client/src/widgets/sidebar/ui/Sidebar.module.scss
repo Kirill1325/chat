@@ -15,11 +15,12 @@
             display: flex;
             flex-direction: column;
             gap: 1em;
-            padding: 1em;
+            padding: 1em 1em .1em 1em;
+            border-bottom: 1px solid #464646;
 
             >img {
-                width: 4em;
-                height: auto;
+                width: 50px;
+                height: 50px;
                 border-radius: 50%;
             }
         }

@@ -1,10 +1,17 @@
-.settingsModal {
+@import '../../../shared/vars.scss';
+
+.filePreviewModal {
     display: none;
 
-    >.settingsModalContent{
+    >.filePreviewModalContent {
+        display: flex;
+        flex-direction: column;
         width: 35vw;
         height: 50vh;
-        background-color: rgb(23,33,43);
+        background-color: $secondary;
+        border-radius: 1vmax;
+        position: relative;
+        overflow: hidden;
 
         >img{
             width: 10em;
@@ -26,4 +33,5 @@
     overflow: auto;
     background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
+
 }

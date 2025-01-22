@@ -1,11 +1,10 @@
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { changeChatId } from '../../chatWindow/model/chatWindowSlice'
 import cl from './ChatWindowHeader.module.scss'
-import logo from '../../../assets/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { socket } from '../../../app/main'
 import { setCurrentSearchedMessageId, setSearchedMessages, setSearching } from '../model/chatWindowHeaderSlice'
-import { UserStatus } from '../../../entities/user/model/types'
+import { UserDto, UserStatus } from '../../../entities/user/model/types'
 
 export const ChatWindowHeader = () => {
 
@@ -16,13 +15,19 @@ export const ChatWindowHeader = () => {
     const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
     const { user } = useAppSelector(state => state.userSlice)
     const { chats } = useAppSelector(state => state.chatsListSlice)
+    const { chatsPictures } = useAppSelector(state => state.chatsListSlice)
 
     const { searchedMessages, searching, currentSearchedMessageId } = useAppSelector(state => state.chatWindowHeaderSlice)
 
-    const chat = chats.find(c => c.chatId === currentChatId)
-    const member = chat?.members.find(m => m.id !== user.id)
-
     const inputRef = useRef<HTMLInputElement>(null)
+
+    const [member, setMember] = useState<UserDto | null>(null)
+
+    useEffect(() => {
+        const chat = chats.find(c => c.chatId === currentChatId)
+        const findMember = chat && chat.members.find(m => m.id !== user.id)
+        findMember && setMember(findMember)
+    }, [currentChatId, user.id, chats])
 
     const handleNextMessage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.stopPropagation()
@@ -131,15 +136,15 @@ export const ChatWindowHeader = () => {
                 </div>
                 :
                 <>
-                    <div className={cl.user}>
-                        <img src={logo} alt='pic' />
-                        {member &&
+                    {member &&
+                        <div className={cl.user}>
+                            <img src={chatsPictures[member.id]} alt='pic' />
                             <div className={cl.usernameWithStatus}>
                                 <p className={cl.username}>{member.username}</p>
                                 <p className={`${member.status === UserStatus.online ? cl.online : cl.offline}`}>{member.status}</p>
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
                     <div className={cl.searchButton}>
                         <button onClick={() => dispatch(setSearching(true))}>
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

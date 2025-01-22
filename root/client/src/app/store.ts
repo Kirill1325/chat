@@ -6,10 +6,11 @@ import sidebarSlice from '../widgets/sidebar/model/sidebarSlice'
 import settingsModalSlice from '../widgets/ssettingsModal/model/settingsModalSlice'
 import chatWindowSlice from '../widgets/chatWindow/model/chatWindowSlice'
 import contextMenuSlice from '../widgets/contextMenu/model/contextMenuSlice'
-import chatCardSlice from '../entities/chatCard/model/chatCardSlice'
+// import chatCardSlice from '../entities/chatCard/model/chatCardSlice'
 import chatsListSlice from '../widgets/chatsList/model/chatsListSlice'
 import contactsModalSlice from '../widgets/contactsModal/model/contactsModalSlice'
 import chatWindowHeaderSlice from '../widgets/chatWindowHeader/model/chatWindowHeaderSlice'
+import filePreviewModalSlice from '../widgets/filePreview/model/filePreviewSlice'
 
 const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
@@ -18,10 +19,11 @@ const rootReducer = combineReducers({
   settingsModalSlice,
   chatWindowSlice,
   contextMenuSlice,
-  chatCardSlice,
+  // chatCardSlice,
   chatsListSlice,
   contactsModalSlice,
-  chatWindowHeaderSlice
+  chatWindowHeaderSlice,
+  filePreviewModalSlice
 })
 
 const store = configureStore({

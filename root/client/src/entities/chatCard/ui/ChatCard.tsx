@@ -1,10 +1,12 @@
-import logo from '../../../assets/logo.png'
 import cl from './ChatCard.module.scss'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { socket } from '../../../app/main'
 import { changeChatId } from '../../../widgets/chatWindow/model/chatWindowSlice'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getTime, Status } from '../../message'
+import { UserDto } from '../../user'
+import { setMemberProfilePic } from '../../../widgets/chatsList/model/chatsListSlice'
+// import { setMemberProfilePic } from '../model/chatCardSlice'
 
 interface ChatCardProps {
     chatId: number
@@ -14,12 +16,30 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
 
     const { user } = useAppSelector(state => state.userSlice)
     const { currentChatId } = useAppSelector(state => state.chatWindowSlice)
-    const { chatsLastMessages } = useAppSelector(state => state.chatCardSlice)
+    const { chatsLastMessages, chatsPictures } = useAppSelector(state => state.chatsListSlice)
     const { chats } = useAppSelector(state => state.chatsListSlice)
-
-    const username = chats.find(c => c.chatId === chatId)?.members.find(m => m.id !== user.id)?.username
-
     const dispatch = useAppDispatch()
+
+    const [member, setMember] = useState<UserDto | null>(null)
+
+    useEffect(() => {
+        const chat = chats.find(c => c.chatId === chatId)
+        const findMember = chat && chat.members.find(m => m.id !== user.id)
+        findMember && setMember(findMember)
+    }, [])
+
+    useEffect(() => {
+        const fetchImage = async () => {
+            if (member && member.id) {
+                const res = await fetch(`http://localhost:8080/user/profile-pic/${member.id.toString()}`)
+                const imageBlob = await res.blob()
+                const imageObjectURL = URL.createObjectURL(imageBlob)
+                dispatch(setMemberProfilePic({ userId: member.id, profilePic: imageObjectURL }))
+            }
+        }
+
+        fetchImage()
+    }, [member])
 
     const handleChatChange = () => {
         user && currentChatId !== chatId && socket.emit('join room', chatId.toString(), user.id)
@@ -38,12 +58,16 @@ export const ChatCard = ({ chatId }: ChatCardProps) => {
                 onClick={handleChatChange}
             >
 
-                <img src={logo} alt='pic' />
+                {member &&
+                    <div className={cl.profilePic}>
+                        <img src={chatsPictures[member.id]} alt='pic' />
+                    </div>
+                }
 
-                {chatsLastMessages[chatId] &&
+                {chatsLastMessages[chatId] && member &&
                     <div className={cl.chatInfo}>
                         <div className={cl.chatInfoInner}>
-                            <p>{username}</p>
+                            <p>{member.username}</p>
                             <p>{chatsLastMessages[chatId].payload}</p>
                             {/* <p>{chatsLastMessages[chatId].sender.username}</p> ONLY FOR GROUP CHATS */}
                         </div>

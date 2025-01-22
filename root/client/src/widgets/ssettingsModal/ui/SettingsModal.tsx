@@ -9,6 +9,7 @@ import { closeSettingsModal } from '../model/settingsModalSlice'
 import cl from './SettingsModal.module.scss'
 import { userApi } from '../../../entities/user';
 import { useEffect, useState } from 'react';
+import { setPreview, openFilePreviewModal } from '../../filePreview/model/filePreviewSlice';
 
 export const SettingsModal = () => {
 
@@ -42,35 +43,50 @@ export const SettingsModal = () => {
     const { user } = useAppSelector(state => state.userSlice)
 
     const { isSettingsModalOpen } = useAppSelector(state => state.settingsModalSlice)
+    const { filePreview } = useAppSelector(state => state.filePreviewModalSlice)
+
+    const [uploadProfilePic] = userApi.useUploadProfilePicMutation()
 
     const dispatch = useAppDispatch()
+    const [file, setFile] = useState<File | undefined>(undefined)
 
-    const [file, setFile] = useState<{picturePreview: string, pictureAsFile: File} | null>(null);
-    const [uploadPicture] = userApi.useUploadPictureMutation()
+    useEffect(() => {
+        console.log('file', file)
+    }, [file])
 
-    // useEffect(() => {
-    //     console.log(file)
-    // }, [file])
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || e.target.files.length === 0) {
+            setFile(undefined)
+            return
+        }
 
-    const setPic = (e: React.ChangeEvent<HTMLInputElement>) => {
-       e.target.files && setFile({
-            picturePreview: URL.createObjectURL(e.target.files[0]),
-            pictureAsFile: e.target.files[0],
-        });
+        setFile(e.target.files[0])
     }
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    useEffect(() => {
+        if (!file) {
+            dispatch(setPreview(undefined))
+            return
+        }
+
+        const objectUrl = URL.createObjectURL(file)
+        console.log(objectUrl)
+        dispatch(setPreview(objectUrl))
+        console.log('open')
+        dispatch(openFilePreviewModal())
+
+        return () => URL.revokeObjectURL(objectUrl)
+    }, [file])
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const formData = new FormData()
         console.log('file', file)
-        file && formData.append("avatar", file.pictureAsFile)
-        console.log(formData)
-        uploadPicture(formData)
+        user && file && uploadProfilePic({ pic: file, userId: user.id })
     }
 
     const handleSettingsModalClose = () => {
         isSettingsModalOpen && dispatch(closeSettingsModal())
-        setFile(null)
+        setFile(undefined)
     }
 
     const ref = useClickOutside(handleSettingsModalClose)
@@ -93,11 +109,11 @@ export const SettingsModal = () => {
             <div className={cl.settingsModalContent} ref={ref} >
                 <p>{user.username}</p>
                 <p>{user.email}</p>
-                <form action="/set-picture" method="POST" encType="multipart/form-data" onSubmit={(e) => handleSubmit(e)}>
-                    <input type='file' name='avatar' id='avatar' onChange={(e) => setPic(e)} />
+                <form onSubmit={(e) => handleSubmit(e)}>
+                    <input type='file' name='file' id='file' onChange={handleFileChange} />
                     <button type='submit'>send</button>
                 </form>
-                <img src={file?.picturePreview} alt='avatar'/>
+                <img src={filePreview} alt='file' />
                 <Button variant={ButtonVariants.outlined}>change password</Button>
 
                 <form onSubmit={formik.handleSubmit}>

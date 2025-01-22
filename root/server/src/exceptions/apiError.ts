@@ -6,12 +6,16 @@ export class ApiError extends Error {
         this.status = status
     }
 
+    static BadRequest(message: string) {
+        return new ApiError(400, message)
+    }
+
     static UnauthorizedError() {
         return new ApiError(401, 'User is not authorized')
     }
 
-    static BadRequest(message: string) {
-        return new ApiError(400, message)
+    static NotFoundError(message: string) {
+        return new ApiError(404, message)
     }
 
     static InternalServerError() {

@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import cl from './MessageField.module.scss'
 import { socket } from '../../../app/main'
-import { useAppSelector } from '../../../app/store'
+import { useAppDispatch, useAppSelector } from '../../../app/store'
+import { openFilePreviewModal, setPreview } from '../../filePreview/model/filePreviewSlice'
 
 interface MessageFieldProps {
   message: string,
@@ -11,6 +12,10 @@ interface MessageFieldProps {
 
 export const MessageField = ({ message, setMessage, handleCancelEditing }: MessageFieldProps) => {
 
+  const [file, setFile] = useState<File | undefined>(undefined)
+
+  const dispatch = useAppDispatch()
+
   const { user } = useAppSelector(state => state.userSlice)
   const { currentChatId, editingMessageId } = useAppSelector(state => state.chatWindowSlice)
 
@@ -19,6 +24,30 @@ export const MessageField = ({ message, setMessage, handleCancelEditing }: Messa
   useEffect(() => {
     inputRef.current && inputRef.current.focus()
   }, [editingMessageId, currentChatId])
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setFile(undefined)
+      return
+    }
+
+    setFile(e.target.files[0])
+  }
+
+  useEffect(() => {
+    if (!file) {
+      dispatch(setPreview(undefined))
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(file)
+    dispatch(setPreview(objectUrl))
+    console.log('open')
+    dispatch(openFilePreviewModal())
+
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [file])
 
   const handleEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
@@ -48,6 +77,15 @@ export const MessageField = ({ message, setMessage, handleCancelEditing }: Messa
 
   return (
     <div className={cl.inputContainer}>
+
+      <input type="file" name="file" id="file" onChange={handleFileChange} />
+      <label htmlFor="file" className={cl.attachment}>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 96 120">
+          <g>
+            <path d="M44.907,2.443 C45.778,2.597 45.466,2.401 45.936,2.848 L84.984,58.616 C88.755,63.997 89.786,70.516 88.086,76.86 C86.776,81.748 83.423,86.442 79.03,89.518 C68.997,96.542 55.316,94.24 48.339,84.276 L10.104,29.671 C7.583,26.07 6.613,21.698 7.376,17.371 C8.139,13.045 10.547,9.265 14.145,6.747 C21.58,1.541 31.863,3.354 37.068,10.788 C37.246,11.041 43.243,19.605 53.134,33.731 C53.134,33.731 53.134,33.731 53.134,33.731 C56.649,38.752 60.416,44.13 64.182,49.509 C66.316,52.557 66.316,52.557 67.822,54.708 C68.952,56.322 68.952,56.322 69.203,56.68 C72.974,62.063 72.391,68.484 67.347,72.014 C64.913,73.718 62.285,74.202 59.143,73.648 C56.121,73.115 53.482,71.433 51.723,68.919 L26.287,32.452 C25.971,31.999 26.082,31.375 26.535,31.059 L30.956,27.977 C31.409,27.661 32.032,27.772 32.348,28.225 L57.779,64.687 C58.407,65.584 59.345,66.181 60.426,66.371 C61.695,66.595 62.329,66.507 63.108,65.962 C64.696,64.849 64.674,63.094 63.151,60.919 C62.9,60.561 62.9,60.561 61.77,58.947 C60.263,56.796 60.263,56.796 58.129,53.748 C54.363,48.369 50.597,42.991 47.082,37.971 C47.082,37.971 47.082,37.971 47.082,37.97 C37.19,23.843 31.194,15.28 31.018,15.027 C29.627,13.04 27.551,11.718 25.162,11.297 C22.775,10.876 20.371,11.409 18.385,12.8 C16.401,14.189 15.078,16.268 14.655,18.655 C14.234,21.043 14.767,23.446 16.157,25.432 L54.391,80.038 C59.026,86.655 68.09,88.156 74.79,83.465 C81.573,78.716 83.513,69.394 78.932,62.855 L39.883,7.087 C39.567,6.634 39.676,6.011 40.129,5.694 L44.543,2.602 L44.907,2.443 z" fill="#ffffff" />
+          </g>
+        </svg>
+      </label>
       <textarea
         name='messageInput'
         id='messageInput'

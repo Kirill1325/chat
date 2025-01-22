@@ -5,10 +5,7 @@ import { configureServer, configureSocketServer } from './config/appConfig';
 import { createTables } from './config/dbConfig';
 import { Server, Socket } from "socket.io";
 import { messageService } from './messages/messageService';
-import chatsService, { ChatTypes } from './chats/chatsService';
-import { authService } from './auth/authService';
-import { UserStatus } from './user/types';
-import { UserDto } from './user/userDto';
+import chatsService from './chats/chatsService';
 import { userService } from './user/userService';
 
 const PORT = process.env.PORT || 3000
@@ -36,9 +33,9 @@ configureSocketServer(io)
 // TODO: remove SELECT *, RETURNING * from all queries
 io.on('connection', (socket: Socket) => {
 
-  console.log('a user connected', socket.data.id);
+  console.log('a user connected', socket.data.id)
 
-  io.sockets.emit('user connected', socket.data.id);
+  io.sockets.emit('user connected', socket.data.id)
 
   const changeStatusToOnline = async () => {
     console.log('users ids', socket.data.id)

@@ -1,24 +1,22 @@
 import { pool } from "../config/dbConfig"
 import { UserDto } from "../user/userDto"
 import { Message } from "../messages/types"
-import { Chat, ChatMember } from "./types"
 
 export enum ChatTypes {
     dm = 'dm',
     group = 'group'
 }
 
-// TODO: make back return everything in camelCase
 class chatsService {
 
-    async createChat(creatorId: number, type: ChatTypes): Promise<{ chatId: number }> {
+    // async createChat(creatorId: number, type: ChatTypes): Promise<{ chatId: number }> {
 
-        const chatId: number = (await pool.query('INSERT INTO chats (type) VALUES ($1) RETURNING chat_id;', [type])).rows[0].chat_id
+    //     const chatId: number = (await pool.query('INSERT INTO chats (type) VALUES ($1) RETURNING chat_id;', [type])).rows[0].chat_id
 
-        await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, creatorId])
+    //     await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, creatorId])
 
-        return { chatId: chatId }
-    }
+    //     return { chatId: chatId }
+    // }
 
     async connectToDm(senderId: number, recipientId: number): Promise<{ chatId: number, members: UserDto[] }> {
 
@@ -38,10 +36,14 @@ class chatsService {
                 .query('SELECT * FROM chat_members WHERE chat_id = $1;', [chatCandidate.chat_id]))
                 .rows.map((user: { user_id: number }) => user.user_id)
 
-            const users = (await pool.query('SELECT * FROM users WHERE id = ANY($1::int[])', [usersIds]))
-                .rows.map((user: any) => new UserDto(user))
+            const users: UserDto[] = (await pool.query('SELECT id, username, status, email FROM users WHERE id = ANY($1::int[])', [usersIds]))
+                .rows
 
             return { chatId: chatCandidate.chat_id, members: users }
+            const res: Record<number, UserDto[]> = {}
+            res[chatCandidate.chat_id] = users
+            console.log('res connect', res)
+            // return res
         }
 
         const chatId: number = (await pool.query('INSERT INTO chats (type) VALUES ($1) RETURNING chat_id;', ['dm'])).rows[0].chat_id
@@ -49,12 +51,15 @@ class chatsService {
         await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, recipientId])
         await pool.query('INSERT INTO chat_members (chat_id, user_id) VALUES ($1, $2);', [chatId, senderId])
 
-        const users = (await pool
-            .query('SELECT * FROM users WHERE id = ANY($1::int[])', [[senderId, recipientId]]))
-            .rows.map((user: any) => new UserDto(user))
+        const users: UserDto[] = (await pool
+            .query('SELECT id, username, status, email FROM users WHERE id = ANY($1::int[])', [[senderId, recipientId]]))
+            .rows
 
         return { chatId: chatId, members: users }
-
+        const res: Record<number, UserDto[]> = {}
+        res[chatId] = users
+        console.log('res connect', res)
+        // return res
     }
 
     async getChats(userId: number): Promise<{ chatId: number, members: UserDto[] }[]> {
@@ -76,15 +81,21 @@ class chatsService {
             GROUP BY 
                 cm.chat_id
         `
+        const result: { chat_id: number, members: UserDto[] }[] = (await pool.query(query, [userId])).rows
+        // console.log('result', result)
+        const res: Record<number, UserDto[]> = result.reduce(function (map, obj) {
+            map[obj.chat_id] = obj.members
+            return map
+        }, {})
 
-        const result: { chat_id: number, members: any[] }[] = (await pool.query(query, [userId])).rows
+        console.log('res', res)
 
         const chats = result.map(row => ({
             chatId: row.chat_id,
-            members: row.members.map((member: any) => new UserDto(member)),
+            members: row.members,
         }))
-
         return chats
+        // return res
     }
 
     async getLastMessage(chatId: number): Promise<string> {

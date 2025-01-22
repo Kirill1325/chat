@@ -4,7 +4,6 @@ import { closeContactsModal } from '../model/contactsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
 import cl from './ContactsModal.module.scss'
 import { socket } from '../../../app/main'
-import pic from '../../../assets/logo.png'
 import { UserDto, UserStatus } from '../../../entities/user/model/types'
 
 export const ContactsModal = () => {
@@ -12,21 +11,18 @@ export const ContactsModal = () => {
     const [searchQuery, setSearchQuery] = useState('')
     const [contacts, setContacts] = useState<UserDto[]>([])
 
-    // const { users } = useAppSelector(state => state.userSlice)
-
     const dispatch = useAppDispatch()
     const { isContactsModalOpen } = useAppSelector(state => state.contactsModalSlice)
-
+    const { chatsPictures } = useAppSelector(state => state.chatsListSlice)
     const { user } = useAppSelector(state => state.userSlice)
-
-    const inputRef = useRef<HTMLInputElement>(null)
 
     const handleClose = () => {
         isContactsModalOpen && dispatch(closeContactsModal())
         setSearchQuery('')
         if (inputRef.current) inputRef.current.value = ''
     }
-
+    
+    const inputRef = useRef<HTMLInputElement>(null)
     const ref = useClickOutside(handleClose)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,7 +102,7 @@ export const ContactsModal = () => {
                     {contacts && contacts.map(contact =>
                         contact.id !== user.id &&
                         <div className={cl.contact} key={contact.id} onClick={() => connectToDm(contact.id)}>
-                            <img src={pic} alt='pic' />
+                            <img src={chatsPictures[contact.id]} alt='pic' />
                             <div className={cl.user}>
                                 <p className={cl.username}>{contact.username}</p>
                                 <p className={`${contact.status === UserStatus.online ? cl.online : ''}`}>{contact.status}</p>

@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { User, Response } from '..'
-import { UpdatePasswordRequest } from '../model/types'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
@@ -13,7 +12,7 @@ export const userApi = createApi({
 
     endpoints: (builder) => ({
 
-        registration: builder.mutation<Response, Partial<User>>({
+        registration: builder.mutation<Response, Omit<User, 'id'>>({
             query: (user) => ({
                 url: 'auth/registration/',
                 method: 'POST',
@@ -25,7 +24,7 @@ export const userApi = createApi({
             })
         }),
 
-        login: builder.mutation<Response, Partial<User>>({
+        login: builder.mutation<Response, Omit<User, 'id' | 'username'>>({
             query: (user) => ({
                 url: 'auth/login/',
                 method: 'POST',
@@ -59,7 +58,7 @@ export const userApi = createApi({
             })
         }),
 
-        changePassword: builder.mutation<Response, UpdatePasswordRequest>({
+        changePassword: builder.mutation<Response, { oldPassword: string, newPassword: string }>({
             query: (body) => ({
                 url: 'auth/change-password',
                 method: 'POST',
@@ -71,16 +70,24 @@ export const userApi = createApi({
             })
         }),
 
-        uploadPicture: builder.mutation<string, FormData>({
-            query: (body) => ({
-                url: 'auth/set-picture',
-                method: 'POST',
-                body,
-                headers: {
-                    // 'Content-Type': 'multipart/form-data',
-                    'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                },
-            })
+        uploadProfilePic: builder.mutation<void, { pic: File, userId: number }>({
+            query: (body) => {
+                let formData = new FormData()
+                formData.append('file', body.pic)
+                formData.append('userId', body.userId.toString())
+
+                return {
+                    url: "user/upload-profile-pic",
+                    method: "POST",
+                    body: formData,
+                    formData: true,
+                    headers: {
+                        'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+                    },
+                }
+            },
+            transformResponse: (response: any) => response.data,
         }),
+
     }),
 })
