@@ -27,7 +27,7 @@ class UserService {
 
     async uploadProfilePic(userId: number, filename: string, filepath: string, mimetype: string, size: number) {
         const checkForPic = (await pool.query('SELECT id FROM profile_pics WHERE user_id=$1', [userId])).rows[0]
-        // console.log('checkForPic', checkForPic)
+
         if (checkForPic) {
             const picId = (await pool.query(
                 'UPDATE profile_pics SET filename = $1, filepath = $2, mimetype = $3, size = $4 WHERE user_id = $5 RETURNING id',
@@ -53,7 +53,7 @@ class UserService {
             size: number,
             user_id: number
         } = (await pool.query('SELECT * FROM profile_pics WHERE user_id = $1', [userId])).rows[0]
-        // console.log('file', file)
+
         if (file) {
             const dirname = path.resolve()
             const fullFilePath = path.join(dirname, file.filepath)

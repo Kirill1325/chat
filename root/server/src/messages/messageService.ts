@@ -5,7 +5,6 @@ import { Message, Status } from "./types";
 class MessageService {
 
     async sendMessage(senderId: number, chatId: number, payload: string, createdAt: string): Promise<{ messageId: number; }> {
-        // TODO: add status
 
         const lastSentMessageId: number = (await pool.query(
             'INSERT INTO messages (sender_id, chat_id, payload, created_at, status) VALUES ($1, $2, $3, $4, $5) RETURNING message_id;',

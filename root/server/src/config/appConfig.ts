@@ -16,6 +16,8 @@ const storageConfig = multer.diskStorage({
     }
 });
 
+export const upload = multer({ storage: storageConfig })
+
 export const configureServer = (app: Application) => {
 
     app
@@ -23,7 +25,7 @@ export const configureServer = (app: Application) => {
         .use(cors<Request>({ credentials: true, origin: process.env.CLIENT_URL }))
         .use(express.json())
         .use(express.static(__dirname))
-        .use(multer({ storage: storageConfig }).single('file'))
+        .use(upload.single('file'))
         .use('/auth', authRouter)
         .use('/user', userRouter)
         .use(errorMiddleware)
@@ -45,4 +47,5 @@ export const configureSocketServer = (io: Server<DefaultEventsMap, DefaultEvents
                 next(new Error('Authentication error'));
             }
         })
+        
 }

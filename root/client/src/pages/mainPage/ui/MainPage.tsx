@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../../app/store"
 import { setUser, setUserProfilePic } from "../../../entities/user/model/userSlice"
 import { ChatsList } from "../../../widgets/chatsList"
@@ -13,10 +13,9 @@ import { ContactsModal } from "../../../widgets/contactsModal"
 import { ChatsListHeader } from "../../../widgets/chatsListHeader"
 import { ChatWindowHeader } from "../../../widgets/chatWindowHeader"
 import { socket } from "../../../app/main"
-import { changeLastSentMessageStatus, setChats, setLastMessage } from "../../../widgets/chatsList/model/chatsListSlice"
+import { changeLastSentMessageStatus, setChats, setLastMessage, setMemberProfilePic } from "../../../widgets/chatsList/model/chatsListSlice"
 import { changeChatId, setMessages, editMessage, deleteMessage, changeMessageStatus } from "../../../widgets/chatWindow/model/chatWindowSlice"
 import { Message } from "../../../entities/message"
-import { UserStatus } from "../../../entities/user/model/types"
 import { FilePreview } from "../../../widgets/filePreview"
 
 export const MainPage = () => {
@@ -52,30 +51,6 @@ export const MainPage = () => {
         fetchImage()
     }, [user.id])
 
-    // useEffect(() => {
-    //     // console.log(users)
-    //     const setProfilePics = async (res: Response) => {
-    //         if (res) {
-    //             const userId = Number(res.url.split('/').pop())
-    //             const imageBlob = await res.blob()
-    //             const imageObjectURL = URL.createObjectURL(imageBlob)
-    //             dispatch(setProfilePic({ userId, profilePic: imageObjectURL }))
-    //             // setPic({ userId, profilePic: imageObjectURL })
-    //         }
-    //     }
-    //     if (!fetched && users.length > 0) {
-    //         Promise
-    //             .all(users.map(u => u && fetch(`http://localhost:8080/user/profile-pic/${u.id.toString()}`)))
-    //             .then(values => values.map(res => setProfilePics(res)))
-    //             .then(() => setFetched(true))
-    //     }
-
-    // }, [users])
-
-    // useEffect(() => {
-    //     pic && dispatch(setProfilePic({ userId: pic.userId, profilePic: pic.profilePic }))
-    // }, [pic])
-
     useEffect(() => {
         if (isLogged) {
             refresh().unwrap().then(userFetced => {
@@ -109,20 +84,6 @@ export const MainPage = () => {
         }
     })
 
-    // useEffect(() => {
-    //     socket.emit('get users')
-    // }, [])
-
-    // useEffect(() => {
-    //     socket.on('get users', (users: UserDto[]) => {
-    //         dispatch(setUsers(users))
-    //     })
-
-    //     return () => {
-    //         socket.off('get users')
-    //     }
-    // })
-
     useEffect(() => {
         socket.on('connect', () => {
             console.log('WebSocket connected')
@@ -132,32 +93,6 @@ export const MainPage = () => {
             socket.off('connect')
         }
     })
-
-    // useEffect(() => {
-    //     socket.on('connect to dm', (chat: Record<number, UserDto[]>) => {
-
-    //         dispatch(setChatsMembers(chat))
-    //         // dispatch(changeChatId(chat.chatId))
-    //         // const chatExists = chats.some(c => c.chatId === chat.chatId)
-    //         // !chatExists && dispatch(setChats([...chats, chat]))
-    //     })
-
-    //     return () => {
-    //         socket.off('connect to dm')
-    //     }
-    // })
-
-    // useEffect(() => {
-    //     socket.on('get chats', (chats: Record<number, UserDto[]>) => {
-    //         console.log(chats)
-    //         dispatch(setChatsMembers(chats))
-    //         // dispatch(setChats(chats))
-    //     })
-
-    //     return () => {
-    //         socket.off('get chats')
-    //     }
-    // }, [user.id])
 
     useEffect(() => {
         socket.on('connect to dm', (chat: { chatId: number, members: UserDto[] }) => {
@@ -242,6 +177,22 @@ export const MainPage = () => {
         }
     })
 
+    useEffect(() => {
+        socket.on('update user profile picture', (userId: number, buffer: ArrayBuffer, mimeType: string) => {
+            console.log(buffer)
+            const blob = new Blob([buffer], { type: mimeType })
+            const imageObjectURL = URL.createObjectURL(blob)
+            console.log(imageObjectURL)
+            userId === user.id
+                ? dispatch(setUserProfilePic({ profilePic: imageObjectURL }))
+                : dispatch(setMemberProfilePic({ userId: userId, profilePic: imageObjectURL }))
+        })
+
+        return () => {
+            socket.off('update user profile picture')
+        }
+    })
+
     const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape' &&
             !isSidebarOpen &&
@@ -265,7 +216,6 @@ export const MainPage = () => {
     return (
 
         <div className={cl.mainPage}>
-            {/* {pic && <img src={pic.profilePic} alt='pic' />} */}
             <Sidebar />
             <SettingsModal />
             <ContactsModal />

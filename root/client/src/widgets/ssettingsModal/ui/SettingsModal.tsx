@@ -9,7 +9,8 @@ import { closeSettingsModal } from '../model/settingsModalSlice'
 import cl from './SettingsModal.module.scss'
 import { userApi } from '../../../entities/user';
 import { useEffect, useState } from 'react';
-import { setPreview, openFilePreviewModal } from '../../filePreview/model/filePreviewSlice';
+import { setPreview } from '../../filePreview/model/filePreviewSlice';
+import { socket } from '../../../app/main';
 
 export const SettingsModal = () => {
 
@@ -34,7 +35,6 @@ export const SettingsModal = () => {
                     dispatch(closeSettingsModal())
                 })
                 .catch(rejected => console.error(rejected))
-
         },
     })
 
@@ -45,23 +45,37 @@ export const SettingsModal = () => {
     const { isSettingsModalOpen } = useAppSelector(state => state.settingsModalSlice)
     const { filePreview } = useAppSelector(state => state.filePreviewModalSlice)
 
-    const [uploadProfilePic] = userApi.useUploadProfilePicMutation()
+    // const [uploadProfilePic] = userApi.useUploadProfilePicMutation()
 
     const dispatch = useAppDispatch()
     const [file, setFile] = useState<File | undefined>(undefined)
 
-    useEffect(() => {
-        console.log('file', file)
-    }, [file])
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const upload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) {
             setFile(undefined)
             return
         }
-
         setFile(e.target.files[0])
     }
+
+    // useEffect(() => {
+    //     const createBuffer = async () => {
+    //         const buffer = file && await file.arrayBuffer()
+    //         file && socket.emit("set profile picture", user.id, buffer, (status: string) => {
+    //             console.log(status);
+    //         })
+    //     }
+    //     createBuffer()
+    // }, [file])
+
+    // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     if (!e.target.files || e.target.files.length === 0) {
+    //         setFile(undefined)
+    //         return
+    //     }
+
+    //     setFile(e.target.files[0])
+    // }
 
     useEffect(() => {
         if (!file) {
@@ -70,18 +84,21 @@ export const SettingsModal = () => {
         }
 
         const objectUrl = URL.createObjectURL(file)
-        console.log(objectUrl)
         dispatch(setPreview(objectUrl))
-        console.log('open')
-        dispatch(openFilePreviewModal())
+        // dispatch(openFilePreviewModal())
 
         return () => URL.revokeObjectURL(objectUrl)
     }, [file])
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log('file', file)
-        user && file && uploadProfilePic({ pic: file, userId: user.id })
+        const buffer = file && await file.arrayBuffer()
+        const fileSize = file && file.size
+        const mimeType = file && file.type
+        user && buffer && socket.emit("update user profile picture", user.id, buffer, mimeType, fileSize, (status: string) => {
+            console.log(status)
+        })
+        dispatch(closeSettingsModal())
     }
 
     const handleSettingsModalClose = () => {
@@ -110,7 +127,8 @@ export const SettingsModal = () => {
                 <p>{user.username}</p>
                 <p>{user.email}</p>
                 <form onSubmit={(e) => handleSubmit(e)}>
-                    <input type='file' name='file' id='file' onChange={handleFileChange} />
+                    <input type='file' name='file' id='file' onChange={upload} />
+                    {/* <input type='file' name='file' id='file' onChange={handleFileChange} /> */}
                     <button type='submit'>send</button>
                 </form>
                 <img src={filePreview} alt='file' />

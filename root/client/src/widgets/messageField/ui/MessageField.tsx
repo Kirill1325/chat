@@ -18,6 +18,11 @@ export const MessageField = ({ message, setMessage, handleCancelEditing }: Messa
 
   const { user } = useAppSelector(state => state.userSlice)
   const { currentChatId, editingMessageId } = useAppSelector(state => state.chatWindowSlice)
+  // const { isFilePreviewModalOpen, filePreview } = useAppSelector(state => state.filePreviewModalSlice)
+
+  // useEffect(() => {
+  //   console.log(isFilePreviewModalOpen)
+  // }, [isFilePreviewModalOpen])
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -36,6 +41,7 @@ export const MessageField = ({ message, setMessage, handleCancelEditing }: Messa
   }
 
   useEffect(() => {
+
     if (!file) {
       dispatch(setPreview(undefined))
       return
@@ -43,10 +49,13 @@ export const MessageField = ({ message, setMessage, handleCancelEditing }: Messa
 
     const objectUrl = URL.createObjectURL(file)
     dispatch(setPreview(objectUrl))
-    console.log('open')
     dispatch(openFilePreviewModal())
 
     return () => URL.revokeObjectURL(objectUrl)
+  }, [file])
+
+  useEffect(() => {
+    console.log(file)
   }, [file])
 
   const handleEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

@@ -70,24 +70,34 @@ export const userApi = createApi({
             })
         }),
 
-        uploadProfilePic: builder.mutation<void, { pic: File, userId: number }>({
-            query: (body) => {
-                let formData = new FormData()
-                formData.append('file', body.pic)
-                formData.append('userId', body.userId.toString())
+        // uploadProfilePic: builder.mutation<void, { pic: File, userId: number }>({
+        //     query: (body) => {
+        //         let formData = new FormData()
+        //         formData.append('file', body.pic)
+        //         formData.append('userId', body.userId.toString())
 
-                return {
-                    url: "user/upload-profile-pic",
-                    method: "POST",
-                    body: formData,
-                    formData: true,
-                    headers: {
-                        'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
-                    },
-                }
-            },
-            transformResponse: (response: any) => response.data,
-        }),
+        //         return {
+        //             url: "user/upload-profile-pic",
+        //             method: "POST",
+        //             body: formData,
+        //             formData: true,
+        //             headers: {
+        //                 'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+        //             },
+        //         }
+        //     },
+        //     transformResponse: (response: any) => response.data,
+        // }),
+
+        // getProfilePic: builder.query<{ mimetype: string, fileName: string, filepath: string }, string>({
+        //     query: (userId) => ({
+        //         url: `user/profile-pic/${userId}`,
+        //         method: 'GET',
+        //         headers: {
+        //             'Access-Control-Allow-Origin': import.meta.env.VITE_CLIENT_URL,
+        //         },
+        //     })
+        // }),
 
     }),
 })

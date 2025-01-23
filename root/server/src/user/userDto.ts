@@ -6,7 +6,6 @@ export class UserDto {
     username: string
     id: number
     status: UserStatus
-    // TODO: add status
 
     constructor(model: IUserDto) {
         this.email = model.email

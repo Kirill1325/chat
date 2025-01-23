@@ -43,5 +43,3 @@ const { actions, reducer } = chatsListSlice
 export const { setChats, setLastMessage, changeLastSentMessageStatus, setMemberProfilePic } = actions
 
 export default reducer
-
-// TODO: maybe delete it

@@ -1,12 +1,13 @@
 import 'dotenv/config'
-import express from 'express';
-import http from 'http';
-import { configureServer, configureSocketServer } from './config/appConfig';
-import { createTables } from './config/dbConfig';
-import { Server, Socket } from "socket.io";
-import { messageService } from './messages/messageService';
-import chatsService from './chats/chatsService';
-import { userService } from './user/userService';
+import express from 'express'
+import http from 'http'
+import { configureServer, configureSocketServer, upload } from './config/appConfig'
+import { createTables } from './config/dbConfig'
+import { Server, Socket } from "socket.io"
+import { messageService } from './messages/messageService'
+import chatsService from './chats/chatsService'
+import { userService } from './user/userService'
+import { createWriteStream, writeFile } from 'fs'
 
 const PORT = process.env.PORT || 3000
 
@@ -24,7 +25,7 @@ const io = new Server(server, {
   cors: {
     origin: '*',
   }
-});
+})
 
 configureServer(app)
 configureSocketServer(io)
@@ -44,18 +45,18 @@ io.on('connection', (socket: Socket) => {
   changeStatusToOnline()
 
   socket.on('join room', async (chatId: string, userId: number) => {
-    await socket.join(chatId);
+    await socket.join(chatId)
     console.log(`user ${userId} joined room ${chatId}`)
-  });
-  socket.on('leave room', async (chatId: string, userId: number) => {
-    await socket.leave(chatId);
-    console.log(`user ${userId} left room ${chatId}`)
-  });
-
-  socket.on('get users', async () => {
-    const users = await userService.getUsers()
-    socket.emit('get users', users)
   })
+  socket.on('leave room', async (chatId: string, userId: number) => {
+    await socket.leave(chatId)
+    console.log(`user ${userId} left room ${chatId}`)
+  })
+
+  // socket.on('get users', async () => {
+  //   const users = await userService.getUsers()
+  //   socket.emit('get users', users)
+  // })
 
   socket.on('search contacts', async (searchQuery: string) => {
     const users = await userService.getUsers(searchQuery)
@@ -108,10 +109,30 @@ io.on('connection', (socket: Socket) => {
     io.sockets.in(chatId.toString()).emit('search messages', messagesIds)
   })
 
+  socket.on('update user profile picture', async (
+    userId: number,
+    profilePicture: Buffer,
+    mimeType: string,
+    size: number,
+    callback: Function
+  ) => {
+
+    const fileName = `${Date.now()}_${userId}.jpg`
+    const filePath = `uploads/${fileName}`
+
+    writeFile(filePath, profilePicture, (err) => {
+      callback({ message: err ? err : "success" })
+    })
+
+    await userService.uploadProfilePic(userId, fileName, filePath, mimeType, size)
+
+    io.sockets.emit('update user profile picture', userId, profilePicture, mimeType)
+  })
+
   socket.on('disconnect', async () => {
     console.log('user disconnected', socket.data.id)
     await userService.changeStatusToOffline(socket.data.id)
     io.sockets.emit('user disconnected', socket.data.id)
-  });
+  })
 
 })

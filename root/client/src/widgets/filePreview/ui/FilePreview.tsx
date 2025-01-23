@@ -8,23 +8,8 @@ export const FilePreview = () => {
 
     const { user } = useAppSelector(state => state.userSlice)
 
-    const { isFilePreviewModalOpen } = useAppSelector(state => state.filePreviewModalSlice)
+    const { isFilePreviewModalOpen, filePreview } = useAppSelector(state => state.filePreviewModalSlice)
     const dispatch = useAppDispatch()
-
-    // const [img, setImg] = useState<string>()
-
-    // useEffect(() => {
-    //     const fetchImage = async () => {
-    //         if (user.id) {
-    //             const res = await fetch(`http://localhost:8080/user/profile-pic/${user.id.toString()}`)
-    //             const imageBlob = await res.blob()
-    //             const imageObjectURL = URL.createObjectURL(imageBlob)
-    //             setImg(imageObjectURL)
-    //         }
-    //     }
-
-    //     fetchImage()
-    // }, [user.id])
 
     const handleClose = () => {
         isFilePreviewModalOpen && dispatch(closeFilePreviewModal())
@@ -46,10 +31,11 @@ export const FilePreview = () => {
         }
     })
 
+
     return (
         <div className={`${cl.filePreviewModal} ${isFilePreviewModalOpen ? cl.open : ''}`} >
             <div className={cl.filePreviewModalContent} ref={ref} >
-                {/* <img src={img} alt='preview' /> */}
+                {filePreview && <img src={filePreview} alt='preview' />}
             </div>
         </div>
     )

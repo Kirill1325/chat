@@ -40,10 +40,7 @@ class chatsService {
                 .rows
 
             return { chatId: chatCandidate.chat_id, members: users }
-            const res: Record<number, UserDto[]> = {}
-            res[chatCandidate.chat_id] = users
-            console.log('res connect', res)
-            // return res
+            
         }
 
         const chatId: number = (await pool.query('INSERT INTO chats (type) VALUES ($1) RETURNING chat_id;', ['dm'])).rows[0].chat_id
@@ -56,10 +53,7 @@ class chatsService {
             .rows
 
         return { chatId: chatId, members: users }
-        const res: Record<number, UserDto[]> = {}
-        res[chatId] = users
-        console.log('res connect', res)
-        // return res
+        
     }
 
     async getChats(userId: number): Promise<{ chatId: number, members: UserDto[] }[]> {
@@ -82,20 +76,12 @@ class chatsService {
                 cm.chat_id
         `
         const result: { chat_id: number, members: UserDto[] }[] = (await pool.query(query, [userId])).rows
-        // console.log('result', result)
-        const res: Record<number, UserDto[]> = result.reduce(function (map, obj) {
-            map[obj.chat_id] = obj.members
-            return map
-        }, {})
-
-        console.log('res', res)
 
         const chats = result.map(row => ({
             chatId: row.chat_id,
             members: row.members,
         }))
         return chats
-        // return res
     }
 
     async getLastMessage(chatId: number): Promise<string> {

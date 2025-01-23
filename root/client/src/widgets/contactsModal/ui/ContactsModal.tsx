@@ -1,8 +1,8 @@
+import cl from './ContactsModal.module.scss'
 import { useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../app/store'
 import { closeContactsModal } from '../model/contactsModalSlice'
 import { useClickOutside } from '../../../shared/useOutsideClick'
-import cl from './ContactsModal.module.scss'
 import { socket } from '../../../app/main'
 import { UserDto, UserStatus } from '../../../entities/user/model/types'
 
